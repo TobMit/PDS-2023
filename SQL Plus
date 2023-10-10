@@ -1,0 +1,8 @@
+Prihlásenie do sql klineta:
+    mitala1@"asterix.fri.uniza.sk/orcl.fri.uniza.sk:1572"
+    potom vyžiada heslo
+
+Import:
+    (musí byť človek už prihlásený XD)
+    host imp mitala1/heslo@"asterix.fri.uniza.sk/orcl.fri.uniza.sk:1572" fromuser=soc_poistovna_bc_small touser=mitala1 file=exp_soc_poist_bc_small.exp
+    to fromuser touser je kôli tomu že keď budem importovať niekoho intého tabuľku tak by mi to bez tohoto neprešlo
