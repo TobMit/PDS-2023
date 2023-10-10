@@ -40,3 +40,65 @@ select *
         join ZAP_PREDMETY zp on st.OS_CISLO = zp.OS_CISLO
             join PREDMET prd on zp.CIS_PREDM = prd.CIS_PREDM
                 where NAZOV like 'a%a%a';
+
+---- soc poisťovňa ------
+-- Vypíšte koľko zamestnanocov má zamestávateľ Tesco.
+select nazov, count(*) as Pocet_Zamestnancov
+    from P_ZAMESTNANEC join P_ZAMESTNAVATEL on P_ZAMESTNANEC.ID_ZAMESTNAVATELA = P_ZAMESTNAVATEL.ICO
+        where NAZOV = 'Tesco'
+            group by nazov;
+
+-- alebo len výpis
+select count(*) as Pocet_Zamestnancov
+    from P_ZAMESTNANEC join P_ZAMESTNAVATEL on P_ZAMESTNANEC.ID_ZAMESTNAVATELA = P_ZAMESTNAVATEL.ICO
+        where NAZOV = 'Tesco';
+
+-- ku každému veku vypíšte počet osôb, ktoré sú oslobodené od poistenia (kažú osobu počítajte raz)
+select (
+    case when substr(ROD_CISLO, 1,2) < to_char(sysdate, 'YY') then to_char(sysdate, 'YY') - substr(ROD_CISLO, 1,2)
+            else 100 + to_char(sysdate, 'YY') - substr(ROD_CISLO, 1,2) end) as rok_narodenia, count(distinct P_POISTENIE.ROD_CISLO) as pocet
+    from P_POISTENIE
+        where OSLOBODENY = 'A' or OSLOBODENY = 'a'
+            group by substr(ROD_CISLO, 1,2)
+                order by 1;
+
+
+-- vypýšte zoznam osôb, ktoré súčastne poberajú viac ako jeden typ príspevku
+select ROD_CISLO, count (ID_TYPU)
+    from P_POBERATEL
+        group by ROD_CISLO
+            having count(ID_TYPU) > 1
+            order by count(ID_TYPU);
+
+-- vypýšte menný zoznam platných poistencov, ktorí nemajú zaplatený ani jeden odvod za posledných 6 meiasov
+select meno, PRIEZVISKO, DAT_DO, DAT_OD, ID_POISTENCA
+    from P_OSOBA join P_POISTENIE poistenie using (rod_cislo)
+        where DAT_DO is null or DAT_DO > sysdate and not exists(select 'x' from P_ODVOD_PLATBA pladba
+                                where poistenie.ID_POISTENCA = pladba.ID_POISTENCA
+                                    and extract(month from DAT_PLATBY) > extract(month from sysdate) - 6 );
+
+------------------------------------------- Z PONDELKA -------------------------------------------
+
+-- Vypísať zamestnancov čo začali a skončili pracovný pomer v rovnakom mesiaci a roku.
+select *
+    from P_ZAMESTNANEC
+        where extract(month from DAT_OD) = extract(month from DAT_DO)
+            and extract(year from DAT_OD) = extract(year from DAT_DO);
+
+-- Vypýsať mestá, v ktorých nebýva nikto s duševnou poruchou
+select *
+    from P_MESTO mesto
+        where not exists(select 'x'
+                            from P_OSOBA os join P_ZTP using (rod_cislo) join P_TYP_POSTIHNUTIA using (id_postihnutia)
+                                where ID_POSTIHNUTIA = 5 and mesto.PSC = os.PSC);
+
+-- Vypýsať mestá a ku každému mestu človeka s najdlhším priezviskom
+select distinct N_MESTA, PRIEZVISKO, ps.PSC
+    from P_MESTO ps left join P_OSOBA on ps.PSC = P_OSOBA.PSC
+        group by N_MESTA, PRIEZVISKO, ps.PSC
+            having length(PRIEZVISKO) = (select max( distinct dlzka) as length
+                                            from  (select length(PRIEZVISKO) as dlzka
+                                                from P_OSOBA
+                                                    where PSC = ps.PSC))
+                order by N_MESTA;
+
