@@ -102,3 +102,8 @@ select distinct N_MESTA, PRIEZVISKO, ps.PSC
                                                     where PSC = ps.PSC))
                 order by N_MESTA;
 
+
+-- Vypísať meno, priezvisko rod číslo pre všetky osoby, ak je osoba ZTP vypísať jej ID a dátum od kedy jej ZTP, vypísať aj osoby ktoré nie sú ZTP
+select distinct MENO, PRIEZVISKO, os.ROD_CISLO, ID_ZTP, DAT_OD
+    from P_OSOBA os left join P_ZTP ztp on os.ROD_CISLO = ztp.ROD_CISLO
+        order by MENO;
