@@ -1,0 +1,253 @@
+Andice 03101
+Babin 02952
+Babise 01354
+Babkov 01311
+Banova 01004
+Bela 01305
+Benadikova 03204
+Benadovo 02963
+Benice 03101
+Benice 03842
+Benov 01401
+Benova Lehota 02601
+Benusovce 03101
+Besenova 03483
+Biela 02705
+Biely Potok 03403
+Bitarova 01004
+Blatnica 03815
+Blazkov 02302
+Harvelka 02305
+Havrania 02705
+Hladovka 02713
+Hlavice 02322
+Hlinene 02354
+Hlinik 03223
+Horelica 02201
+Horna Lehota 02741
+Horna Stubna 03846
+Horna Tizina 01306
+Horne Jaseno 03802
+Horny Hricov 01342
+Horny Kalnik 03802
+Horny Stefanov 02744
+Horny Turcek 03848
+Horny Vadicov 02345
+Horky 01004
+Hrabove 01401
+Hrboltova 01341
+Hruby Buk 02352
+Hrustin 02952
+Hubova 03491
+Husarik 02204
+Huty 02732
+Hvozdnica 01356
+Hybe 03231
+Chlebnice 02755
+Istebne 02753
+Ivachnova 03483
+Ivancina 03845
+Izipovce 03223
+Jablonove 01352
+Jalovec 03221
+Jamnik 03301
+Jasenova 02601
+Jasenovska 02957
+Javorova 02322
+Jazernica 03844
+Jedlovnik 02355
+Kalamenova 03822
+Kalameny 03482
+Kalinov 02302
+Kamenna Poruba 01314
+Kevice 03845
+Klace 01319
+Klacno 03401
+Klastor pod Znievom 03843
+Klin 02941
+Klokocov 02322
+Klubina 02304
+Borsky Mikulas 90877
+Molca 97401
+Motova 96001
+Mucin 98531
+Mula 99122
+Muranska Huta 04901
+Muranska Zdychava 05001
+Mytna 98553
+Myto pod Dumbierom 97644
+Nandraz 04961
+Nedeliste 98513
+Nemce 97401
+Nemecka 97697
+Nenince 99126
+Neporadza 98045
+Neresnica 96001
+Nevolne 96701
+Nitra nad Iplom 98557
+Nizna Kalosa 98252
+Nizna Pokoradz 97901
+Nova Bana 96801
+Nova Basta 98034
+Nova Masa 97669
+Nova Ves 99105
+Novacany 04913
+Nove Hony 98542
+Novy Sad 98541
+Novy Svet 98545
+Obeckov 99105
+Obrucna 98558
+Ocova 96223
+Rakosska Bana 04961
+Rakovec 96265
+Rakytnik 98021
+Rakytovce 97405
+Rapovce 98531
+Rasice 98262
+Ratka 98601
+Ratkova 98265
+Ratkovska Sucha 98267
+Ratkovske Bystre 98266
+Raztoka 97697
+Repiste 96603
+Repistia 98265
+Revistske Podzamcie 96681
+Revuca 05001
+Revucka Lehota 04918
+Revucka 05001
+Riecka 97401
+Riecka 98045
+Rimavska Bana 98053
+Spisske Vlachy 05361
+Spissky Hrusov 05363
+Stanca 07616
+Stankovce 07221
+Stankovce 07661
+Stara Voda 05334
+Stare 07223
+Stratena 04971
+Strazne 07652
+Strazske 07222
+Streda nad Bodrogom 07631
+Stretava 07213
+Suche 07101
+Svata Maria 07635
+Svatus 07255
+Svatuse 07683
+Svinica 04445
+Svinice 07637
+Sykavka 05376
+Samudovce 07201
+Semsa 04421
+Stefanska Huta 05351
+Stitnik 04932
+Stos 04426
+Svedlar 05334
+Tahyna 07214
+Tasula 07252
+Teplicany 04431
+Teplicka 05201
+Tiba 04912
+Tibava 07301
+Ticha Voda 05333
+Trebejov 04481
+Trebisov 07501
+Trhoviste 07204
+Trnava pri Laborci 07231
+Trnavka 07801
+Trstany 04445
+Trstany 05363
+Trstene pri Hornade 04411
+Turna nad Bodvou 04402
+Tusice 07202
+Ubrez 07242
+Uhorna 05566
+Upor 07616
+Vajkovce 04443
+Vcelare 04402
+Vec 07635
+Velaty 07615
+Velka Bara 07632
+Velka Ida 04455
+Velka Lodina 04481
+Velka Trna 07682
+Velke Kapusany 07901
+Velke Ozorovce 07801
+Velke Raskovce 07675
+Velke Revistia 07243
+Velke Slemence 07677
+Velke Trakany 07642
+Velke Zaluzice 07234
+Velky Folkmar 05551
+Velky Hores 07652
+Velky Kamenec 07636
+Velky Ruskov 07501
+Vidova 04911
+Vinicky 07631
+Vinne 07231
+Visnov 07661
+Vitkovce 05363
+Vlachovo 04924
+Vojany 07672
+Vojcice 07622
+Vojka 07683
+Vojkovce 05361
+Vojnatina 07261
+Vola 07221
+Vrbnica 07216
+Vrbovec 07101
+Vsechsvatych 04413
+Vtackovce 04447
+Vysocky Dvor 07214
+Vysna Hutka 04018
+Vysna Kamenica 04445
+Vysny Caj 04416
+Vysny Klatov 04412
+Vysny Lanec 04474
+Vysny Medzev 04425
+Zadiel 04402
+Zahajnica 05333
+Zahor 07253
+Zaluzice 07234
+Zatin 07653
+Zavadka 05333 
+Zbehnov 07801 
+Zbudza 07223 
+Zdoba 04441 
+Zemplin 07634 
+Zemplinska Nova Ves 07616
+Zemplinska Sirava 07236 
+Zemplinska Siroka 07213 
+Zemplinska Teplica 07664 
+Zemplinske Hradiste 07601 
+Zemplinske Jastrabie 07605 
+Zemplinske Kopcany 07217 
+Zemplinsky Branc 07602 
+Zemplinsky Klecenov 07616 
+Zlata Idka 04461 
+Zabany 07101 
+Zakarovce 05571 
+Zarnov 04402 
+Zbince 07216 
+Zdana 04411 
+Zehra 05361 
+Zirovce 04445 
+Plavecky Mikulas 90635 
+Plavecky Stvrtok 90068 
+Reca 92526 
+Rohoznik 90638 
+Rovinka 90041 
+Senec 90301 
+Slovensky Grob 90026 
+Studene 90046 
+Studienka 90875
+Stupava 90031
+Suchohrad 90064 
+Svaty Jur 90021 
+Senkvice 90081 
+Stefanova 90086 
+Tomasov 90044 
+Turen 90301 
+Velke Levare 90873 
+Velky Biel 90024 
+Vinicne 90023 

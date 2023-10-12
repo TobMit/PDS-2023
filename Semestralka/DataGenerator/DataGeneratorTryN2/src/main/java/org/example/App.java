@@ -1,10 +1,11 @@
 package org.example;
 
-import com.sun.source.tree.Tree;
 import net.datafaker.Faker;
 
 
-import java.lang.reflect.Array;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
@@ -17,8 +18,9 @@ public class App
 
     public static final int POCET_ZNACIEK = 100;
     private static ArrayList<Pair> znacky_aut = new ArrayList<Pair>();
-    private static ArrayList<Pair> stavy_aut = new ArrayList<Pair>();
+    private static ArrayList<Pair> stav_auta = new ArrayList<Pair>();
     private static ArrayList<Pair> typy_aut = new ArrayList<Pair>();
+    private static ArrayList<Pair> adresa = new ArrayList<Pair>();
     private static Faker faker = new Faker(new Locale("sk"));
 
     public static void main( String[] args )
@@ -32,6 +34,9 @@ public class App
         }
 
         carGenerator();
+        typyGenerator();
+        stavGenerator();
+        adresaGenerator();
     }
 
     private static void carGenerator() {
@@ -49,42 +54,81 @@ public class App
             i++;
         }
 
-        System.out.println("Auta vygenerovane: " + znacky_aut.size());
+        System.out.println("Znacky aut vygenerovane: " + znacky_aut.size());
     }
 
     private static void stavGenerator() {
-        TreeMap<String,String> tmpStavy = new TreeMap<String,String>();
+//        TreeMap<String,String> tmpStavy = new TreeMap<String,String>();
         ArrayList<String> stavy = new ArrayList<String>(List.of(new String[]{"Pozicane", "Volne"}));
-        for (String stav : stavy) {
-            if (!tmpStavy.containsKey(stav)) {
-                tmpStavy.put(stav, stav);
-            }
-        }
+//        for (String stav : stavy) {
+//            if (!tmpStavy.containsKey(stav)) {
+//                tmpStavy.put(stav, stav);
+//            }
+//        }
+//        for (Map.Entry<String, String> entry : tmpStavy.entrySet()) {
+//            stavy_aut.add(new Pair(String.valueOf(i), entry.getKey()));
+//            i++;
+//        }
         int i = 0;
-        for (Map.Entry<String, String> entry : tmpStavy.entrySet()) {
-            stavy_aut.add(new Pair(String.valueOf(i), entry.getKey()));
+        for (String s : stavy) {
+            stav_auta.add(new Pair(String.valueOf(i), s));
             i++;
         }
+        System.out.println("Stav auta vygenerovane: " + stav_auta.size());
     }
 
     private static void typyGenerator() {
-        TreeMap<String, String> tmpTypy = new TreeMap<>();
+//        TreeMap<String, String> tmpTypy = new TreeMap<>();
         ArrayList<String> typy = new ArrayList<String>(List.of(new String[]{"Combi", "Suv", "Sedan"}));
-        for (String typ: typy) {
-            if (!tmpTypy.containsKey(typ)) {
-                tmpTypy.put(typ, typ);
-            }
-        }
+//        for (String typ: typy) {
+//            if (!tmpTypy.containsKey(typ)) {
+//                tmpTypy.put(typ, typ);
+//            }
+//        }
+//        for (Map.Entry<String, String> entry : tmpTypy.entrySet()) {
+//            typy_aut.add(new Pair(String.valueOf(i), entry.getKey()));
+//        i++;
+//        }
         int i =0;
-        for (Map.Entry<String, String> entry : tmpTypy.entrySet()) {
-            typy_aut.add(new Pair(String.valueOf(i), entry.getKey()));
+        for (String s : typy) {
+            typy_aut.add(new Pair(String.valueOf(i), s));
             i++;
         }
+        System.out.println("Typy aut vygenerovane: " + typy_aut.size());
     }
 
     private static void adresaGenerator() {
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(
+                    "/Users/tobiasmitala/Documents/School/PDS-2023/Semestralka/DataGenerator/DataGeneratorTryN2/src/main/java/org/example/DataSaver/Resources/cities.txt"));
+            String line = reader.readLine();
+            int i = 0;
+            while (line != null) {
+                String[] obec = line.split(" ");
+                if (obec.length == 2) {
+                    adresa.add(new Pair(obec[1], obec[0]));
+                }
+                else {
+                    StringBuilder builder = new StringBuilder();
+                    for (int j = 0; j < obec.length - 1; j++) {
+                        builder.append(obec[j] + " ");
+                    }
+                    // ten substring tam je pre to aby som orezal poslednu medzeru
+                    adresa.add(new Pair(obec[obec.length - 1], builder.substring(0, builder.length() - 1)));
 
+                }
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        for (int i = 0; i < POCET_OBCI; i++) {
+//            System.out.println(faker.address().city() + " " + faker.address().zipCode());
+//        }
 
+        System.out.println("Adresy nacitane: " + adresa.size());
     }
 
     private static String generateBirthNumber(Faker faker) {
