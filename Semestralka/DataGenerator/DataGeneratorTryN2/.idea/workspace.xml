@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4d736671-f85b-4d1d-b085-0dd3686796fd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/DataSaver/Osoba.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/DataSaver/Resources/Transakcie.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/DataSaver/Vozidlo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/DataSaver/Vozidlo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/DataSaver/Vozidlo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Pair.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Pair.java" afterDir="false" />
     </list>
     <list id="a8945c77-6e84-4bcb-8e18-d5db51651c2a" name="Changes by axel" comment="" />
     <list id="1723d261-fceb-467e-8f1a-fc1a8fffa5e8" name="Changes by klacek" comment="" />
@@ -126,22 +124,11 @@
       <workItem from="1697051622591" duration="4707000" />
       <workItem from="1697058052141" duration="7000" />
       <workItem from="1697096535971" duration="2191000" />
-      <workItem from="1697120920946" duration="4053000" />
+      <workItem from="1697120920946" duration="10506000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/example/App.java</url>
-          <line>63</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

@@ -1,6 +1,9 @@
 package org.example;
 
 import net.datafaker.Faker;
+import net.datafaker.transformations.JsonTransformer;
+import org.example.DataSaver.Osoba;
+import org.example.DataSaver.Vozidlo;
 
 
 import java.io.BufferedReader;
@@ -18,12 +21,27 @@ public class App
 
     public static final int POCET_ZNACIEK = 100;
     public static final int POCET_ULIC = 70;
-    private static ArrayList<Pair> znacky_aut = new ArrayList<Pair>();
-    private static ArrayList<Pair> stav_auta = new ArrayList<Pair>();
-    private static ArrayList<Pair> typy_aut = new ArrayList<Pair>();
-    private static ArrayList<Pair> adresa = new ArrayList<Pair>();
+    public static final int POCET_VOZIDIEL = 35;
+    public static final int POCET_OSOB = 2000;
+    public static final double PRAVDEBODOBNST_ZENY = 0.48;
+
+    private static ArrayList<Pair<Integer, String>> znacky_aut = new ArrayList<Pair<Integer, String>>();
+    private static ArrayList<Pair<Integer, String>> stav_auta = new ArrayList<Pair<Integer, String>>();
+    private static ArrayList<Pair<Integer, String>> typy_aut = new ArrayList<Pair<Integer, String>>();
+    private static ArrayList<Pair<String, String>> adresa = new ArrayList<Pair<String, String>>();
     private static ArrayList<String> arrUlice = new ArrayList<>();
+    private static ArrayList<String> arrRodCisloMuzi = new ArrayList<>();
+    private static ArrayList<String> arrRodCisloZeny = new ArrayList<>();
+    private static ArrayList<String> arrObcianskyPreukaz = new ArrayList<>();
+    private static ArrayList<String> arrNameWoman = new ArrayList<>();
+    private static ArrayList<String> arrNameMan = new ArrayList<>();
+    private static ArrayList<String> arrPriezviskoWoman = new ArrayList<>();
+    private static ArrayList<String> arrPriezviskoMan = new ArrayList<>();
+    private static ArrayList<Osoba> osoba = new ArrayList<>();
+    private static ArrayList<Vozidlo> vozidla = new ArrayList<>();
+
     private static Faker faker = new Faker(new Locale("sk"));
+    private static Random random = new Random();
 
     public static void main( String[] args )
     {
@@ -40,6 +58,11 @@ public class App
         stavGenerator();
         adresaGenerator();
         ulicaGenerator();
+        rodneCislaGenerator();
+        obcianskyPreukazGenerator();
+        menaPriezviskaGenerator();
+        osobaGenerator();
+        vozidlaGenerator();
     }
 
     private static void carGenerator() {
@@ -53,7 +76,7 @@ public class App
 
         int i = 0;
         for (Map.Entry<String, String> entry : tmpZnacky.entrySet()) {
-            znacky_aut.add(new Pair(String.valueOf(i), entry.getKey()));
+            znacky_aut.add(new Pair<Integer, String>(i, entry.getKey()));
             i++;
         }
 
@@ -74,7 +97,7 @@ public class App
 //        }
         int i = 0;
         for (String s : stavy) {
-            stav_auta.add(new Pair(String.valueOf(i), s));
+            stav_auta.add(new Pair<Integer, String>(i, s));
             i++;
         }
         System.out.println("Stav auta vygenerovane: " + stav_auta.size());
@@ -94,7 +117,7 @@ public class App
 //        }
         int i =0;
         for (String s : typy) {
-            typy_aut.add(new Pair(String.valueOf(i), s));
+            typy_aut.add(new Pair<Integer, String>(i, s));
             i++;
         }
         System.out.println("Typy aut vygenerovane: " + typy_aut.size());
@@ -146,7 +169,166 @@ public class App
         System.out.println("Pomocný zoznam ulíc vygenerovaný: " + arrUlice.size());
     }
 
-    private static String generateBirthNumber(Faker faker) {
+    private static void rodneCislaGenerator() {
+        TreeMap<String, String> muzi = new TreeMap<>();
+        TreeMap<String, String> zeny = new TreeMap<>();
+        while (muzi.size() < POCET_OSOB) {
+            //todo for maros onyl man generate
+            String tmp = generateBirthNumber();
+            if (!muzi.containsKey(tmp)){
+                muzi.put(tmp, tmp);
+            }
+        }
+        for (String s : muzi.keySet()) {
+            arrRodCisloMuzi.add(s);
+        }
+        System.out.println("Rodne cisla muzi vygenerovane: " + arrRodCisloMuzi.size());
+
+        while (zeny.size() < POCET_OSOB) {
+            //todo for maros onyl woman generate
+            String tmp = generateBirthNumber();
+            if (!zeny.containsKey(tmp)){
+                zeny.put(tmp, tmp);
+            }
+        }
+        for (String s : zeny.keySet()) {
+            arrRodCisloZeny.add(s);
+        }
+
+        System.out.println("Rodne cisla zeny vygenerovane: " + arrRodCisloZeny.size());
+    }
+
+    private static void obcianskyPreukazGenerator() {
+        TreeMap<String, String> obc = new TreeMap<>();
+        while (obc.size() < 2*POCET_OSOB){
+            StringBuilder builder = new StringBuilder();
+            char tmp = 'A';
+            builder.append((char) (tmp + random.nextInt(26)));
+            builder.append((char) (tmp + random.nextInt(26)));
+            builder.append(random.nextInt(9));
+            builder.append(random.nextInt(9));
+            builder.append(random.nextInt(9));
+            builder.append(random.nextInt(9));
+            builder.append(random.nextInt(9));
+            builder.append(random.nextInt(9));
+            if (!obc.containsKey(builder.toString())) {
+                obc.put(builder.toString(), builder.toString());
+            }
+        }
+
+        for (String s : obc.keySet()) {
+            arrObcianskyPreukaz.add(s);
+        }
+        System.out.println("Cisla obcianských preukazov vygenerovane: " + arrObcianskyPreukaz.size());
+    }
+
+    private static void menaPriezviskaGenerator() {
+        try {
+            BufferedReader reader;
+
+            // mena mužov
+            reader = new BufferedReader(new FileReader("src/main/java/org/example/DataSaver/Resources/NameMan.txt"));
+            String tmp = reader.readLine();
+            while (tmp != null) {
+                arrNameMan.add(tmp);
+                tmp = reader.readLine();
+            }
+            reader.close();
+            System.out.println("Mena muzov nacitane: " + arrNameMan.size());
+
+            // mena žien
+            reader = new BufferedReader(new FileReader("src/main/java/org/example/DataSaver/Resources/NameWoman.txt"));
+            tmp = reader.readLine();
+            while (tmp != null) {
+                arrNameWoman.add(tmp);
+                tmp = reader.readLine();
+            }
+            reader.close();
+            System.out.println("Mena zien nacitane: " + arrNameWoman.size());
+
+            // priezviska muzov
+            reader = new BufferedReader(new FileReader("src/main/java/org/example/DataSaver/Resources/PriezviskoMan.txt"));
+            tmp = reader.readLine();
+            while (tmp != null) {
+                arrPriezviskoMan.add(tmp);
+                tmp = reader.readLine();
+            }
+            reader.close();
+            System.out.println("Priezviska muzov nacitane: " + arrPriezviskoMan.size());
+
+            // priezviska žien
+            reader = new BufferedReader(new FileReader("src/main/java/org/example/DataSaver/Resources/PrizviskaWoman.txt"));
+            tmp = reader.readLine();
+            while (tmp != null) {
+                arrPriezviskoWoman.add(tmp);
+                tmp = reader.readLine();
+            }
+            reader.close();
+            System.out.println("Priezviska zien nacitane: " + arrPriezviskoWoman.size());
+
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
+
+    private static void osobaGenerator() {
+        int pocetMuzov = 0;
+        int pocetZien = 0;
+        for (int i = 0; i < POCET_OSOB; i++) {
+            Osoba tmpOsoba = new Osoba();
+            if (random.nextDouble() > PRAVDEBODOBNST_ZENY){
+                // generujeme muzov
+                Pair<String, String> tmpAdresa = adresa.get(random.nextInt(adresa.size()));
+                tmpOsoba.psc = tmpAdresa.key;
+                tmpOsoba.rod_cislo = getRodCislo(false);
+                tmpOsoba.Meno = arrNameMan.get(random.nextInt(arrNameMan.size()));
+                tmpOsoba.Priezvisko = arrPriezviskoMan.get(random.nextInt(arrPriezviskoMan.size()));
+                tmpOsoba.cislo_obcianskeho = getCisloObcianskeho();
+                tmpOsoba.ulica = tmpAdresa.value;
+                tmpOsoba.id_osoby = i;
+                pocetMuzov++;
+            } else {
+                // generujeme zeny
+                Pair<String, String> tmpAdresa = adresa.get(random.nextInt(adresa.size()));
+                tmpOsoba.psc = tmpAdresa.key;
+                tmpOsoba.rod_cislo = getRodCislo(true);
+                tmpOsoba.Meno = arrNameWoman.get(random.nextInt(arrNameWoman.size()));
+                tmpOsoba.Priezvisko = arrPriezviskoWoman.get(random.nextInt(arrPriezviskoWoman.size()));
+                tmpOsoba.cislo_obcianskeho = getCisloObcianskeho();
+                tmpOsoba.ulica = tmpAdresa.value;
+                tmpOsoba.id_osoby = i;
+                pocetZien++;
+            }
+//            System.out.println(tmpOsoba);
+            osoba.add(tmpOsoba);
+        }
+        System.out.println("Vygenerované osoby: " + osoba.size());
+        System.out.println("\tZeny: " + pocetZien);
+        System.out.println("\tMuzi: " + pocetMuzov);
+    }
+
+    private static void vozidlaGenerator() {
+        for (int i = 0; i < POCET_VOZIDIEL; i++) {
+            Vozidlo tmpVozidlo = new Vozidlo();
+            tmpVozidlo.znacka_auta = znacky_aut.get(random.nextInt(znacky_aut.size())).key;
+            tmpVozidlo.typ_auta = typy_aut.get(random.nextInt(typy_aut.size())).key;
+            tmpVozidlo.stav_vozidla = stav_auta.get(random.nextInt(stav_auta.size())).key;
+            tmpVozidlo.ecv = ""; //todo for matus generator xD
+            tmpVozidlo.pocet_miest_na_sedenie = random.nextInt(6); //todo premyslieť či to má zmysel random (môže byť miest na sedenie aj 3) a to moc nedáva zmysel
+            tmpVozidlo.fotka = ""; //todo for maros toto nemam ponatia ako
+            tmpVozidlo.rok_vyroby = 1989 + random.nextInt(32);
+            char[] typ_motora = new char[]{'D', 'B', 'E'}; //dizel, benzín, elektrina
+            tmpVozidlo.typ_motora = typ_motora[random.nextInt(typ_motora.length)];
+            tmpVozidlo.seriove_cislo_vozidla = String.valueOf(i); //todo asi nejaký lepší generátor
+            vozidla.add(tmpVozidlo);
+        }
+        System.out.println("Vygenerované vozidla: " + vozidla.size());
+    }
+
+    //todo transakcie viac máš maroš v hlasovke
+    //todo uložiť do súboru, da sa pre triedy ktoré sa poutívajú spraviť custom toString ktorý by ti automaticky vygeneroval riadok
+
+    private static String generateBirthNumber() {
         // Generate a random date of birth between 1990 and 2003
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, 1990);
@@ -252,5 +434,28 @@ public class App
             }
         }
         return sum;
+    }
+
+    private static String getRodCislo(boolean zena) {
+        String tmp;
+        if (zena) {
+            int tmpIndex = random.nextInt(arrRodCisloZeny.size());
+            tmp = arrRodCisloZeny.get(tmpIndex);
+            arrRodCisloZeny.remove(tmpIndex);
+        } else {
+            int tmpIndex = random.nextInt(arrRodCisloMuzi.size());
+            tmp = arrRodCisloMuzi.get(tmpIndex);
+            arrRodCisloMuzi.remove(tmpIndex);
+        }
+
+        return tmp;
+    }
+
+    private static String getCisloObcianskeho() {
+        int tmpIndex = random.nextInt(arrObcianskyPreukaz.size());
+        String tmp = arrObcianskyPreukaz.get(tmpIndex);
+        arrObcianskyPreukaz.remove(tmpIndex);
+
+        return tmp;
     }
 }

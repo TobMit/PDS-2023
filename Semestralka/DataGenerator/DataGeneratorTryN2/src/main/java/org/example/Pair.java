@@ -1,17 +1,14 @@
 package org.example;
 import java.util.ArrayList;
-public class Pair {
-    public String key;
-    public String value;
+public class Pair<T, K> {
+    public T key;
+    public K value;
 
-    public Pair(String key, String value) {
+    public Pair(T key, K value) {
         this.key = key;
         this.value = value;
     }
 
-    public Pair() {
-        this.key = "";
-        this.value = "";
-    }
+    public Pair() {}
 }
 
