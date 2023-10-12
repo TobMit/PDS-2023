@@ -17,10 +17,12 @@ public class App
 {
 
     public static final int POCET_ZNACIEK = 100;
+    public static final int POCET_ULIC = 70;
     private static ArrayList<Pair> znacky_aut = new ArrayList<Pair>();
     private static ArrayList<Pair> stav_auta = new ArrayList<Pair>();
     private static ArrayList<Pair> typy_aut = new ArrayList<Pair>();
     private static ArrayList<Pair> adresa = new ArrayList<Pair>();
+    private static ArrayList<String> arrUlice = new ArrayList<>();
     private static Faker faker = new Faker(new Locale("sk"));
 
     public static void main( String[] args )
@@ -28,15 +30,16 @@ public class App
 
 
 //        String carBrand = faker.vehicle().manufacturer();
-        for (int i = 0; i < 100; i++) {
-            String birthNumber = generateBirthNumber(faker);
-            System.out.println(birthNumber + " " + getSum(birthNumber));
-        }
+//        for (int i = 0; i < 100; i++) {
+//            String birthNumber = generateBirthNumber(faker);
+//            System.out.println(birthNumber + " " + getSum(birthNumber));
+//        }
 
         carGenerator();
         typyGenerator();
         stavGenerator();
         adresaGenerator();
+        ulicaGenerator();
     }
 
     private static void carGenerator() {
@@ -101,9 +104,8 @@ public class App
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(
-                    "/Users/tobiasmitala/Documents/School/PDS-2023/Semestralka/DataGenerator/DataGeneratorTryN2/src/main/java/org/example/DataSaver/Resources/cities.txt"));
+                    "src/main/java/org/example/DataSaver/Resources/cities.txt"));
             String line = reader.readLine();
-            int i = 0;
             while (line != null) {
                 String[] obec = line.split(" ");
                 if (obec.length == 2) {
@@ -124,11 +126,24 @@ public class App
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        for (int i = 0; i < POCET_OBCI; i++) {
-//            System.out.println(faker.address().city() + " " + faker.address().zipCode());
-//        }
 
         System.out.println("Adresy nacitane: " + adresa.size());
+    }
+
+    private static void ulicaGenerator() {
+        // generuj názvy ulíc pomoco fakera
+        TreeMap<String, String> ulice = new TreeMap<>();
+        while (ulice.size() < POCET_ULIC){
+            String tmp = faker.address().streetAddress(false);
+            if (!ulice.containsKey(tmp)) {
+                ulice.put(tmp, tmp);
+            }
+        }
+        for (String s : ulice.keySet()) {
+            arrUlice.add(s);
+        }
+
+        System.out.println("Pomocný zoznam ulíc vygenerovaný: " + arrUlice.size());
     }
 
     private static String generateBirthNumber(Faker faker) {
