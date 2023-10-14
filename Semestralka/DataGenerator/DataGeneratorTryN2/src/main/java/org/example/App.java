@@ -1,14 +1,17 @@
 package org.example;
 
 import net.datafaker.Faker;
-import net.datafaker.transformations.JsonTransformer;
 import org.example.DataSaver.Osoba;
+import org.example.DataSaver.Transakcia;
 import org.example.DataSaver.Vozidlo;
 
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
@@ -21,9 +24,13 @@ public class App
 
     public static final int POCET_ZNACIEK = 100;
     public static final int POCET_ULIC = 70;
-    public static final int POCET_VOZIDIEL = 35;
+    public static final int POCET_VOZIDIEL = 50;
     public static final int POCET_OSOB = 2000;
     public static final double PRAVDEBODOBNST_ZENY = 0.48;
+
+    public static final LocalDate START_DATE = LocalDate.of(2008, 6, 14);
+
+    public static final LocalDate END_DATE = LocalDate.now();
 
     private static ArrayList<Pair<Integer, String>> znacky_aut = new ArrayList<Pair<Integer, String>>();
     private static ArrayList<Pair<Integer, String>> stav_auta = new ArrayList<Pair<Integer, String>>();
@@ -39,20 +46,12 @@ public class App
     private static ArrayList<String> arrPriezviskoMan = new ArrayList<>();
     private static ArrayList<Osoba> osoba = new ArrayList<>();
     private static ArrayList<Vozidlo> vozidla = new ArrayList<>();
+    private static ArrayList<Transakcia> transakcie = new ArrayList<>();
 
     private static Faker faker = new Faker(new Locale("sk"));
     private static Random random = new Random();
 
-    public static void main( String[] args )
-    {
-
-
-//        String carBrand = faker.vehicle().manufacturer();
-//        for (int i = 0; i < 100; i++) {
-//            String birthNumber = generateBirthNumber(faker);
-//            System.out.println(birthNumber + " " + getSum(birthNumber));
-//        }
-
+    public static void main( String[] args ) {
         carGenerator();
         typyGenerator();
         stavGenerator();
@@ -63,6 +62,7 @@ public class App
         menaPriezviskaGenerator();
         osobaGenerator();
         vozidlaGenerator();
+        transakciaGenerator();
     }
 
     private static void carGenerator() {
@@ -167,6 +167,95 @@ public class App
         }
 
         System.out.println("Pomocný zoznam ulíc vygenerovaný: " + arrUlice.size());
+    }
+
+    private static void transakciaGenerator() {
+        int availableCars = POCET_VOZIDIEL;
+        LocalDate currentDate = START_DATE;
+        ArrayList<Integer> currentlyRentedCarsIndexes = new ArrayList<>();
+        ArrayList<Month> summerMonths = new ArrayList<>(List.of(Month.JUNE, Month.JULY, Month.AUGUST));
+        HashMap<LocalDate, List<Integer>> endDatesOfTransactions = new HashMap<>();
+        int numberOfCarsRentedToday;
+        int[] carRentDurationInterval;
+        int randomVehicleIndex;
+        int randomPersonIndex;
+
+        while (!currentDate.isAfter(END_DATE)) {
+            // During the summer the people rent more cards for longer time periods
+            if (summerMonths.contains(currentDate.getMonth()) || currentDate.getMonth() == Month.DECEMBER
+                    || currentDate.getMonth() == Month.APRIL) {
+                numberOfCarsRentedToday = faker.random().nextInt(13, 18);
+                carRentDurationInterval = new int[]{1, 5};
+            }
+            // During the weekend people will rent more cars, but for a shorter duration
+            else if (currentDate.getDayOfWeek() == DayOfWeek.SATURDAY || currentDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                numberOfCarsRentedToday = faker.random().nextInt(12, 15);
+                carRentDurationInterval = new int[]{1, 5};
+            // During the weekdays people will rent fewer cards with an okay duration or the shortest duration
+            } else {
+                numberOfCarsRentedToday = faker.random().nextInt(23, 25);
+                carRentDurationInterval = new int[]{1, 2};
+            }
+
+            List<Integer> todayTransactions = endDatesOfTransactions.get(currentDate);
+            // Remove car indexes whose rental ends today from the rented cars ArrayList
+            if (todayTransactions != null) {
+                for (int index: todayTransactions) {
+                    currentlyRentedCarsIndexes.remove(Integer.valueOf(index));
+                    availableCars++;
+                }
+                endDatesOfTransactions.remove(currentDate);
+            }
+
+            // Generate transactions
+            while (numberOfCarsRentedToday > 0 && availableCars > 0) {
+                // select a random vehicle that is not being rented
+                randomVehicleIndex = faker.random().nextInt(0, POCET_VOZIDIEL - 1);
+                randomPersonIndex = faker.random().nextInt(0, POCET_OSOB - 1);
+                if (currentlyRentedCarsIndexes.isEmpty()) {
+                    currentlyRentedCarsIndexes.add(randomVehicleIndex);
+                } else {
+                    while (currentlyRentedCarsIndexes.contains(randomVehicleIndex)) {
+                        randomVehicleIndex = faker.random().nextInt(0, POCET_VOZIDIEL - 1);
+                    }
+                    currentlyRentedCarsIndexes.add(randomVehicleIndex);
+                }
+                
+                Vozidlo selectedVehicle = vozidla.get(randomVehicleIndex);
+                Osoba selectedPerson = osoba.get(randomPersonIndex);
+                int daysRented = faker.random()
+                        .nextInt(carRentDurationInterval[0], carRentDurationInterval[1]);
+                int totalRentalPrice = selectedVehicle.dayRentalPrice * daysRented;
+                LocalDate rentalEndDate = currentDate.plusDays(daysRented);
+
+                Transakcia transaction;
+                if (rentalEndDate.isBefore(END_DATE)) {
+                    transaction = new Transakcia(currentDate, rentalEndDate, totalRentalPrice,
+                            selectedPerson.id_osoby, selectedVehicle.seriove_cislo_vozidla);
+                } else {
+                    transaction = new Transakcia(currentDate, totalRentalPrice,
+                            selectedPerson.id_osoby, selectedVehicle.seriove_cislo_vozidla);
+                }
+                transakcie.add(transaction);
+
+                if (endDatesOfTransactions.containsKey(rentalEndDate)) {
+                    List<Integer> currValue = endDatesOfTransactions.get(rentalEndDate);
+                    currValue.add(randomVehicleIndex);
+                    endDatesOfTransactions.put(rentalEndDate, currValue);
+                } else {
+                    endDatesOfTransactions.put(rentalEndDate, new ArrayList<>(List.of(randomVehicleIndex)));
+                }
+
+                numberOfCarsRentedToday--;
+                availableCars--;
+            }
+
+            System.out.println("Date " + currentDate.toString() + "done, total transactions " +
+                    transakcie.size() + ", pocet volnych aut " + availableCars);
+            currentDate = currentDate.plusDays(1);
+        }
+
+        System.out.println(endDatesOfTransactions);
     }
 
     private static void rodneCislaGenerator() {
@@ -308,9 +397,10 @@ public class App
     }
 
     private static void vozidlaGenerator() {
+        ArrayList<Integer> carRentalDayPrices = new ArrayList<>(List.of(50, 80, 100, 150, 170, 200, 400, 500));
         for (int i = 0; i < POCET_VOZIDIEL; i++) {
             Vozidlo tmpVozidlo = new Vozidlo();
-            tmpVozidlo.znacka_auta = znacky_aut.get(random.nextInt(znacky_aut.size())).key;
+            Vozidlo.znacka_auta = znacky_aut.get(random.nextInt(znacky_aut.size())).key;
             tmpVozidlo.typ_auta = typy_aut.get(random.nextInt(typy_aut.size())).key;
             tmpVozidlo.stav_vozidla = stav_auta.get(random.nextInt(stav_auta.size())).key;
             tmpVozidlo.ecv = ""; //todo for matus generator xD
@@ -320,6 +410,7 @@ public class App
             char[] typ_motora = new char[]{'D', 'B', 'E'}; //dizel, benzín, elektrina
             tmpVozidlo.typ_motora = typ_motora[random.nextInt(typ_motora.length)];
             tmpVozidlo.seriove_cislo_vozidla = String.valueOf(i); //todo asi nejaký lepší generátor
+            tmpVozidlo.dayRentalPrice = carRentalDayPrices.get(faker.random().nextInt(0, carRentalDayPrices.size() - 1));
             vozidla.add(tmpVozidlo);
         }
         System.out.println("Vygenerované vozidla: " + vozidla.size());
