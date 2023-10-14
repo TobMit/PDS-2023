@@ -48,6 +48,8 @@ public class App
     private static ArrayList<Vozidlo> vozidla = new ArrayList<>();
     private static ArrayList<Transakcia> transakcie = new ArrayList<>();
 
+    private static HashMap<String, List<Integer>> numberOfCarSeats = new HashMap<>();
+
     private static Faker faker = new Faker(new Locale("sk"));
     private static Random random = new Random();
 
@@ -58,6 +60,7 @@ public class App
         adresaGenerator();
         ulicaGenerator();
         rodneCislaGenerator();
+        numberOfSeatsGenerator();
         obcianskyPreukazGenerator();
         menaPriezviskaGenerator();
         osobaGenerator();
@@ -81,6 +84,116 @@ public class App
         }
 
         System.out.println("Znacky aut vygenerovane: " + znacky_aut.size());
+    }
+
+    private static void numberOfSeatsGenerator() {
+        numberOfCarSeats.put("Abarth", List.of(2));
+        numberOfCarSeats.put("Acura", List.of(2, 5, 7));
+        numberOfCarSeats.put("Aixam", List.of(2));
+        numberOfCarSeats.put("Alfa Romeo", List.of(2, 4, 5));
+        numberOfCarSeats.put("Alpine", List.of(2));
+        numberOfCarSeats.put("Aston Martin", List.of(2));
+        numberOfCarSeats.put("Audi", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Baojun", List.of(5, 7));
+        numberOfCarSeats.put("Bentley", List.of(4, 5));
+        numberOfCarSeats.put("BMW", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Brilliance", List.of(5, 7));
+        numberOfCarSeats.put("Bugatti", List.of(2));
+        numberOfCarSeats.put("Buick", List.of(5, 7));
+        numberOfCarSeats.put("BYD", List.of(5, 7));
+        numberOfCarSeats.put("Cadillac", List.of(5, 7));
+        numberOfCarSeats.put("Caterham", List.of(2));
+        numberOfCarSeats.put("Chang'an", List.of(5, 7));
+        numberOfCarSeats.put("Chevrolet", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Chrysler", List.of(5, 7));
+        numberOfCarSeats.put("Citroën", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Dacia", List.of(5, 7));
+        numberOfCarSeats.put("Daihatsu", List.of(2, 4, 5));
+        numberOfCarSeats.put("Datsun", List.of(5));
+        numberOfCarSeats.put("Dodge", List.of(5, 7));
+        numberOfCarSeats.put("Dongfeng", List.of(5, 7));
+        numberOfCarSeats.put("DS", List.of(4, 5));
+        numberOfCarSeats.put("Dongfeng Fengshen", List.of(5, 7));
+        numberOfCarSeats.put("Fiat", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Karma", List.of(4, 5));
+        numberOfCarSeats.put("Ford", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Ferrari", List.of(2));
+        numberOfCarSeats.put("Geely", List.of(5, 7));
+        numberOfCarSeats.put("Genesis", List.of(5));
+        numberOfCarSeats.put("GMC", List.of(5, 7));
+        numberOfCarSeats.put("Hino Motors", List.of(2));
+        numberOfCarSeats.put("Holden (HSV)", List.of(5, 7));
+        numberOfCarSeats.put("Honda", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Hyundai", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Infiniti", List.of(5));
+        numberOfCarSeats.put("Isuzu", List.of(2, 4, 5));
+        numberOfCarSeats.put("Jaguar", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Jeep", List.of(4, 5, 7));
+        numberOfCarSeats.put("Jie Fang", List.of(5, 7));
+        numberOfCarSeats.put("Kantanka", List.of(5, 7));
+        numberOfCarSeats.put("Koenigsegg", List.of(2));
+        numberOfCarSeats.put("Kia", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Lada", List.of(5, 7));
+        numberOfCarSeats.put("Lamborghini", List.of(2));
+        numberOfCarSeats.put("Lancia", List.of(4, 5));
+        numberOfCarSeats.put("Land Rover", List.of(5, 7));
+        numberOfCarSeats.put("Lexus", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Ligier", List.of(2));
+        numberOfCarSeats.put("Lincoln", List.of(5, 7));
+        numberOfCarSeats.put("Lotus", List.of(2));
+        numberOfCarSeats.put("LTI", List.of(4, 5));
+        numberOfCarSeats.put("Luxgen", List.of(5, 7));
+        numberOfCarSeats.put("Mahindra", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Maruti Suzuki", List.of(5, 7));
+        numberOfCarSeats.put("Maserati", List.of(4, 5));
+        numberOfCarSeats.put("Mastretta", List.of(2));
+        numberOfCarSeats.put("Maybach", List.of(4, 5));
+        numberOfCarSeats.put("Mazda", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("McLaren", List.of(2));
+        numberOfCarSeats.put("Mercedes-Benz", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("MG", List.of(5));
+        numberOfCarSeats.put("Microcar", List.of(2));
+        numberOfCarSeats.put("Mini", List.of(2, 4, 5));
+        numberOfCarSeats.put("Mitsubishi", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Morgan", List.of(2));
+        numberOfCarSeats.put("NEVS", List.of(5, 7));
+        numberOfCarSeats.put("Nissan", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Noble", List.of(2));
+        numberOfCarSeats.put("Opel", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Pagani", List.of(2));
+        numberOfCarSeats.put("Perodua", List.of(5));
+        numberOfCarSeats.put("Peugeot", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("PGO", List.of(2));
+        numberOfCarSeats.put("Porsche", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("PROTON", List.of(5, 7));
+        numberOfCarSeats.put("Ram", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Ravon", List.of(5, 7));
+        numberOfCarSeats.put("Renault", List.of(5, 7));
+        numberOfCarSeats.put("Rimac", List.of(2));
+        numberOfCarSeats.put("Roewe", List.of(5, 7));
+        numberOfCarSeats.put("Rolls Royce", List.of(4, 5));
+        numberOfCarSeats.put("Saleen", List.of(2, 4));
+        numberOfCarSeats.put("Samand", List.of(5, 7));
+        numberOfCarSeats.put("Renault Samsung Motors", List.of(5, 7));
+        numberOfCarSeats.put("SEAT", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Senova", List.of(5, 7));
+        numberOfCarSeats.put("Škoda", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Smart", List.of(2));
+        numberOfCarSeats.put("SsangYong", List.of(5, 7));
+        numberOfCarSeats.put("Subaru", List.of(5, 7));
+        numberOfCarSeats.put("Suzuki", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Tata", List.of(5, 7));
+        numberOfCarSeats.put("Tesla", List.of(5, 7));
+        numberOfCarSeats.put("Tiba/Miniator", List.of(5, 7));
+        numberOfCarSeats.put("Toyota", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Uniti", List.of(2));
+        numberOfCarSeats.put("Vauxhall", List.of(5, 7));
+        numberOfCarSeats.put("Venucia", List.of(5, 7));
+        numberOfCarSeats.put("Volkswagen", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Volvo Cars", List.of(2, 4, 5, 7));
+        numberOfCarSeats.put("Vuhl", List.of(2));
+        numberOfCarSeats.put("Wuling", List.of(5, 7));
+        numberOfCarSeats.put("IVM", List.of(5, 7));
     }
 
     private static void stavGenerator() {
@@ -260,7 +373,6 @@ public class App
         TreeMap<String, String> muzi = new TreeMap<>();
         TreeMap<String, String> zeny = new TreeMap<>();
         while (muzi.size() < POCET_OSOB) {
-            //todo for maros onyl man generate
             String tmp = generateBirthNumber(false);
             if (!muzi.containsKey(tmp)){
                 muzi.put(tmp, tmp);
@@ -270,7 +382,6 @@ public class App
         System.out.println("Rodne cisla muzi vygenerovane: " + arrRodCisloMuzi.size());
 
         while (zeny.size() < POCET_OSOB) {
-            //todo for maros onyl woman generate
             String tmp = generateBirthNumber(true);
             if (!zeny.containsKey(tmp)){
                 zeny.put(tmp, tmp);
@@ -394,11 +505,15 @@ public class App
         ArrayList<Integer> carRentalDayPrices = new ArrayList<>(List.of(50, 80, 100, 150, 170, 200, 400, 500));
         for (int i = 0; i < POCET_VOZIDIEL; i++) {
             Vozidlo tmpVozidlo = new Vozidlo();
-            Vozidlo.znacka_auta = znacky_aut.get(random.nextInt(znacky_aut.size())).key;
+
+            Pair<Integer, String> carBrandPair = znacky_aut.get(random.nextInt(znacky_aut.size()));
+            List<Integer> carBrandSeatsOptions = numberOfCarSeats.get(carBrandPair.value);
+
+            Vozidlo.znacka_auta = carBrandPair.key;
             tmpVozidlo.typ_auta = typy_aut.get(random.nextInt(typy_aut.size())).key;
             tmpVozidlo.stav_vozidla = stav_auta.get(random.nextInt(stav_auta.size())).key;
             tmpVozidlo.ecv = ""; //todo for matus generator xD
-            tmpVozidlo.pocet_miest_na_sedenie = random.nextInt(6); //todo premyslieť či to má zmysel random (môže byť miest na sedenie aj 3) a to moc nedáva zmysel
+            tmpVozidlo.pocet_miest_na_sedenie = carBrandSeatsOptions.get(faker.random().nextInt(carBrandSeatsOptions.size()));
             tmpVozidlo.fotka = ""; //todo for maros toto nemam ponatia ako
             tmpVozidlo.rok_vyroby = 1989 + random.nextInt(32);
             char[] typ_motora = new char[]{'D', 'B', 'E'}; //dizel, benzín, elektrina
