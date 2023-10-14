@@ -137,7 +137,7 @@ public class App
                 else {
                     StringBuilder builder = new StringBuilder();
                     for (int j = 0; j < obec.length - 1; j++) {
-                        builder.append(obec[j] + " ");
+                        builder.append(obec[j]).append(" ");
                     }
                     // ten substring tam je pre to aby som orezal poslednu medzeru
                     adresa.add(new Pair(obec[obec.length - 1], builder.substring(0, builder.length() - 1)));
@@ -254,8 +254,6 @@ public class App
                     transakcie.size() + ", pocet volnych aut " + availableCars);
             currentDate = currentDate.plusDays(1);
         }
-
-        System.out.println(endDatesOfTransactions);
     }
 
     private static void rodneCislaGenerator() {
@@ -263,26 +261,22 @@ public class App
         TreeMap<String, String> zeny = new TreeMap<>();
         while (muzi.size() < POCET_OSOB) {
             //todo for maros onyl man generate
-            String tmp = generateBirthNumber();
+            String tmp = generateBirthNumber(false);
             if (!muzi.containsKey(tmp)){
                 muzi.put(tmp, tmp);
             }
         }
-        for (String s : muzi.keySet()) {
-            arrRodCisloMuzi.add(s);
-        }
+        arrRodCisloMuzi.addAll(muzi.keySet());
         System.out.println("Rodne cisla muzi vygenerovane: " + arrRodCisloMuzi.size());
 
         while (zeny.size() < POCET_OSOB) {
             //todo for maros onyl woman generate
-            String tmp = generateBirthNumber();
+            String tmp = generateBirthNumber(true);
             if (!zeny.containsKey(tmp)){
                 zeny.put(tmp, tmp);
             }
         }
-        for (String s : zeny.keySet()) {
-            arrRodCisloZeny.add(s);
-        }
+        arrRodCisloZeny.addAll(zeny.keySet());
 
         System.out.println("Rodne cisla zeny vygenerovane: " + arrRodCisloZeny.size());
     }
@@ -419,10 +413,11 @@ public class App
     //todo transakcie viac máš maroš v hlasovke
     //todo uložiť do súboru, da sa pre triedy ktoré sa poutívajú spraviť custom toString ktorý by ti automaticky vygeneroval riadok
 
-    private static String generateBirthNumber() {
-        // Generate a random date of birth between 1990 and 2003
+    private static String generateBirthNumber(boolean womanGeneration) {
+
+        // Generate a random date of birth between 1970 and 2003
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, 1990);
+        calendar.set(Calendar.YEAR, 1970);
         Date startDate = calendar.getTime();
         calendar.set(Calendar.YEAR, 2003);
         Date endDate = calendar.getTime();
@@ -440,8 +435,7 @@ public class App
         SimpleDateFormat dayFormat = new SimpleDateFormat("dd");
         String formattedDay = dayFormat.format(dateOfBirth);
 
-        // Add a 50% chance to add +50 to the month part
-        if (faker.bool().bool()) {
+        if (womanGeneration) {
             formattedMonthDay = String.format("%02d", Integer.parseInt(formattedMonthDay) + 50);
         }
 
@@ -449,70 +443,46 @@ public class App
         formattedDay = String.format("%02d", Integer.parseInt(formattedDay));
         lastTwoDigitsOfYear = String.format("%02d", Integer.parseInt(lastTwoDigitsOfYear));
 
-        // Generate a unique identifier or use additional information based on your country's format
-        // For demonstration purposes, generate a random 4-digit number
+        // Calculate the current sum
+        String birthNumberIdentifierShort = lastTwoDigitsOfYear + formattedMonthDay + formattedDay;
+        int currentSum = getSum(birthNumberIdentifierShort);
         String uniqueIdentifier = String.format("%04d", faker.number().numberBetween(1000, 9999));
 
-        // Calculate the current sum
-        String birthNumberIdentifier = lastTwoDigitsOfYear + formattedMonthDay + formattedDay + uniqueIdentifier;
-        int currentSum = getSum(birthNumberIdentifier);
-
-        StringBuilder finalBirthNumberBuilder = new StringBuilder();
-
-        if (currentSum % 11 != 0) {
-
-            // Calculate the remainder when the current sum is divided by 11
-            int remainder = currentSum % 11;
-
-            // Calculate the adjustment needed to make the whole number divisible by 11
-            int adjustment = (11 - remainder) % 11;
-
-            // Select a random digit from the unique identifier
-            int randomDigitIndex = faker.number().numberBetween(0, 4); // Assuming a 4-digit unique identifier
-            int selectedDigit = Character.getNumericValue(uniqueIdentifier.charAt(randomDigitIndex));
-
-            // Adjust the selected digit to make the whole number divisible by 11
-            int adjustedDigit = (selectedDigit + adjustment) % 10;
-
-            // Handle carry-over if the adjusted digit is larger than 10
-            int carry = (selectedDigit + adjustment) / 10;
-
-            // Update the unique identifier with the adjusted digit and handle carry-over
-            StringBuilder updatedIdentifierBuilder = new StringBuilder(uniqueIdentifier);
-            updatedIdentifierBuilder.setCharAt(randomDigitIndex, Character.forDigit(adjustedDigit, 10));
-
-            // Handle carry-over to the next digit or wrap around to the first digit
-            for (int i = randomDigitIndex + 1; i < 4 && carry > 0; i++) {
-                int currentDigit = Character.getNumericValue(updatedIdentifierBuilder.charAt(i));
-                int newDigit = (currentDigit + carry) % 10;
-                carry = (currentDigit + carry) / 10;
-                updatedIdentifierBuilder.setCharAt(i, Character.forDigit(newDigit, 10));
+        if (womanGeneration) {
+            while ((currentSum + getSum(uniqueIdentifier)) % 11 != 0 || arrRodCisloZeny.contains(lastTwoDigitsOfYear +
+                    formattedMonthDay +
+                    formattedDay +
+                    "/" +
+                    uniqueIdentifier)) {
+                uniqueIdentifier = String.format("%04d", faker.number().numberBetween(1000, 9999));
             }
 
-            if (carry > 0) {
-                // If carry-over remains, wrap around to the first digit
-                int currentFirstDigit = Character.getNumericValue(updatedIdentifierBuilder.charAt(0));
-                int newFirstDigit = (currentFirstDigit + carry) % 10;
-                updatedIdentifierBuilder.setCharAt(0, Character.forDigit(newFirstDigit, 10));
-            }
-
-            String updatedIdentifier = updatedIdentifierBuilder.toString();
-
-            // Use StringBuilder for efficient string concatenation
-            finalBirthNumberBuilder.append(lastTwoDigitsOfYear)
-                    .append(formattedMonthDay)
-                    .append(formattedDay)
-                    .append("/")
-                    .append(updatedIdentifier);
+            arrRodCisloZeny.add(lastTwoDigitsOfYear +
+                    formattedMonthDay +
+                    formattedDay +
+                    "/" +
+                    uniqueIdentifier);
         } else {
-            finalBirthNumberBuilder.append(lastTwoDigitsOfYear)
-                    .append(formattedMonthDay)
-                    .append(formattedDay)
-                    .append("/")
-                    .append(uniqueIdentifier);
+            while ((currentSum + getSum(uniqueIdentifier)) % 11 != 0 || arrRodCisloMuzi.contains(lastTwoDigitsOfYear +
+                    formattedMonthDay +
+                    formattedDay +
+                    "/" +
+                    uniqueIdentifier)) {
+                uniqueIdentifier = String.format("%04d", faker.number().numberBetween(1000, 9999));
+            }
+
+            arrRodCisloMuzi.add(lastTwoDigitsOfYear +
+                    formattedMonthDay +
+                    formattedDay +
+                    "/" +
+                    uniqueIdentifier);
         }
 
-        return finalBirthNumberBuilder.toString();
+        return lastTwoDigitsOfYear +
+                formattedMonthDay +
+                formattedDay +
+                "/" +
+                uniqueIdentifier;
     }
 
     private static int getSum(String number) {
