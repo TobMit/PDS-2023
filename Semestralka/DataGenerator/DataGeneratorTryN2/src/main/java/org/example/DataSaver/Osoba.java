@@ -1,5 +1,7 @@
 package org.example.DataSaver;
 
+import static org.example.DataSaver.DataSaver.CSV_DELIMETER;
+
 public class Osoba {
     public String psc;
     public String rod_cislo;
@@ -10,6 +12,7 @@ public class Osoba {
     public int id_osoby;
 
     public String toString() {
-        return psc + " " + rod_cislo + " " + Meno + " " + Priezvisko + " " + cislo_obcianskeho + " " + ulica + " " + id_osoby;
+        return psc + CSV_DELIMETER + rod_cislo + CSV_DELIMETER + Meno + CSV_DELIMETER + Priezvisko + CSV_DELIMETER
+                + cislo_obcianskeho + CSV_DELIMETER + ulica + CSV_DELIMETER + id_osoby + '\n';
     }
 }

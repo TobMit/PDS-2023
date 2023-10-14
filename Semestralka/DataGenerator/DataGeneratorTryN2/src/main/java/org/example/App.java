@@ -1,6 +1,7 @@
 package org.example;
 
 import net.datafaker.Faker;
+import org.example.DataSaver.DataSaver;
 import org.example.DataSaver.Osoba;
 import org.example.DataSaver.Transakcia;
 import org.example.DataSaver.Vozidlo;
@@ -14,6 +15,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 import java.text.SimpleDateFormat;
+
+import static org.example.DataSaver.DataSaver.CSV_DELIMETER;
 
 /**
  * Hello world!
@@ -32,26 +35,26 @@ public class App
 
     public static final LocalDate END_DATE = LocalDate.now();
 
-    private static ArrayList<Pair<Integer, String>> znacky_aut = new ArrayList<Pair<Integer, String>>();
-    private static ArrayList<Pair<Integer, String>> stav_auta = new ArrayList<Pair<Integer, String>>();
-    private static ArrayList<Pair<Integer, String>> typy_aut = new ArrayList<Pair<Integer, String>>();
-    private static ArrayList<Pair<String, String>> adresa = new ArrayList<Pair<String, String>>();
-    private static ArrayList<String> arrUlice = new ArrayList<>();
-    private static ArrayList<String> arrRodCisloMuzi = new ArrayList<>();
-    private static ArrayList<String> arrRodCisloZeny = new ArrayList<>();
-    private static ArrayList<String> arrObcianskyPreukaz = new ArrayList<>();
-    private static ArrayList<String> arrNameWoman = new ArrayList<>();
-    private static ArrayList<String> arrNameMan = new ArrayList<>();
-    private static ArrayList<String> arrPriezviskoWoman = new ArrayList<>();
-    private static ArrayList<String> arrPriezviskoMan = new ArrayList<>();
-    private static ArrayList<Osoba> osoba = new ArrayList<>();
-    private static ArrayList<Vozidlo> vozidla = new ArrayList<>();
-    private static ArrayList<Transakcia> transakcie = new ArrayList<>();
+    private static final ArrayList<Pair<Integer, String>> znacky_aut = new ArrayList<>();
+    private static final ArrayList<Pair<Integer, String>> stav_auta = new ArrayList<>();
+    private static final ArrayList<Pair<Integer, String>> typy_aut = new ArrayList<>();
+    private static final ArrayList<Pair<String, String>> adresa = new ArrayList<>();
+    private static final ArrayList<String> arrUlice = new ArrayList<>();
+    private static final ArrayList<String> arrRodCisloMuzi = new ArrayList<>();
+    private static final ArrayList<String> arrRodCisloZeny = new ArrayList<>();
+    private static final ArrayList<String> arrObcianskyPreukaz = new ArrayList<>();
+    private static final ArrayList<String> arrNameWoman = new ArrayList<>();
+    private static final ArrayList<String> arrNameMan = new ArrayList<>();
+    private static final ArrayList<String> arrPriezviskoWoman = new ArrayList<>();
+    private static final ArrayList<String> arrPriezviskoMan = new ArrayList<>();
+    private static final ArrayList<Osoba> osoba = new ArrayList<>();
+    private static final ArrayList<Vozidlo> vozidla = new ArrayList<>();
+    private static final ArrayList<Transakcia> transakcie = new ArrayList<>();
 
-    private static HashMap<String, List<Integer>> numberOfCarSeats = new HashMap<>();
+    private static final HashMap<String, List<Integer>> numberOfCarSeats = new HashMap<>();
 
-    private static Faker faker = new Faker(new Locale("sk"));
-    private static Random random = new Random();
+    private static final Faker faker = new Faker(new Locale("sk"));
+    private static final Random random = new Random();
 
     public static void main( String[] args ) {
         carGenerator();
@@ -66,10 +69,78 @@ public class App
         osobaGenerator();
         vozidlaGenerator();
         transakciaGenerator();
+
+        saveData();
+    }
+
+    private static void saveData() {
+        // Output files
+        DataSaver typyAutSaver = new DataSaver("typy_aut.csv");
+        DataSaver stavAutaSaver = new DataSaver("stav_aut.csv");
+        DataSaver znackyAutSaver = new DataSaver("znacky_aut.csv");
+        DataSaver adresaSaver = new DataSaver("adresa.csv");
+        DataSaver osobaSaver = new DataSaver("osoba.csv");
+        DataSaver vozidloSaver = new DataSaver("vozidlo.csv");
+        DataSaver transakcieSaver = new DataSaver("transakcie.csv");
+
+        // typy aut
+        typyAutSaver.appendData("nazov_typu" + CSV_DELIMETER + "id_typu" + '\n');
+        for (Pair<Integer, String > typAutaPair: typy_aut) {
+            typyAutSaver.appendData(typAutaPair.value + CSV_DELIMETER + typAutaPair.key + '\n');
+        }
+
+        // stav aut
+        stavAutaSaver.appendData("nazov_stavu" + CSV_DELIMETER + "id_stavu" + '\n');
+        for (Pair<Integer, String > stavAutaPar: stav_auta) {
+            stavAutaSaver.appendData(stavAutaPar.value + CSV_DELIMETER + stavAutaPar.key + '\n');
+        }
+
+        // znacka aut
+        znackyAutSaver.appendData("nazov_znacky" + CSV_DELIMETER + "id_znacky" + '\n');
+        for (Pair<Integer, String > znackyAutaPair: znacky_aut) {
+            znackyAutSaver.appendData(znackyAutaPair.value + CSV_DELIMETER + znackyAutaPair.key + '\n');
+        }
+
+        // adresa
+        adresaSaver.appendData("mesto" + CSV_DELIMETER + "psc" + '\n');
+        for (Pair<String , String > adresaPair: adresa) {
+            adresaSaver.appendData(adresaPair.key + CSV_DELIMETER + adresaPair.value + '\n');
+        }
+
+        // osoba
+        osobaSaver.appendData("psc" + CSV_DELIMETER + "rod_cislo" + CSV_DELIMETER + "meno" +
+                CSV_DELIMETER + "priezvisko" + CSV_DELIMETER + "cislo_obcianskeho" + CSV_DELIMETER + "ulica" + CSV_DELIMETER + "id_osoby" + '\n');
+        for (Osoba osoba: osoba) {
+            osobaSaver.appendData(osoba.toString());
+        }
+
+        // vozidlo
+        vozidloSaver.appendData("znacka_auta" + CSV_DELIMETER + "typ_auta" + CSV_DELIMETER + "stav_vozidla" +
+                CSV_DELIMETER + "ecv" + CSV_DELIMETER + "pocet_miest_na_sedenie" + CSV_DELIMETER + "fotka" + CSV_DELIMETER
+                + "rok_vyroby" + CSV_DELIMETER + "pocet_najazdenych_km" + CSV_DELIMETER + "typ_motora" + CSV_DELIMETER + "seriove_cislo_vozidla" + '\n');
+        for (Vozidlo vozidlo: vozidla) {
+            vozidloSaver.appendData(vozidlo.toString());
+        }
+
+        // transakcie
+        transakcieSaver.appendData("dat_od" + CSV_DELIMETER + "dat_do" + CSV_DELIMETER + "suma" +
+                CSV_DELIMETER + "id_osoby" + CSV_DELIMETER + "id_vozidla" + '\n');
+        for (Transakcia transakcia: transakcie) {
+            transakcieSaver.appendData(transakcia.toString());
+        }
+
+        typyAutSaver.saveDataToFile();
+        stavAutaSaver.saveDataToFile();
+        znackyAutSaver.saveDataToFile();
+        adresaSaver.saveDataToFile();
+        osobaSaver.saveDataToFile();
+        vozidloSaver.saveDataToFile();
+        transakcieSaver.saveDataToFile();
+
     }
 
     private static void carGenerator() {
-        TreeMap<String, String> tmpZnacky = new TreeMap<String, String>();
+        TreeMap<String, String> tmpZnacky = new TreeMap<>();
         while (tmpZnacky.size() < POCET_ZNACIEK) {
             String carBrand = faker.vehicle().manufacturer();
             if (!tmpZnacky.containsKey(carBrand)) {
@@ -77,9 +148,9 @@ public class App
             }
         }
 
-        int i = 0;
+        int i = 1;
         for (Map.Entry<String, String> entry : tmpZnacky.entrySet()) {
-            znacky_aut.add(new Pair<Integer, String>(i, entry.getKey()));
+            znacky_aut.add(new Pair<>(i, entry.getKey()));
             i++;
         }
 
@@ -198,7 +269,7 @@ public class App
 
     private static void stavGenerator() {
 //        TreeMap<String,String> tmpStavy = new TreeMap<String,String>();
-        ArrayList<String> stavy = new ArrayList<String>(List.of(new String[]{"Pozicane", "Volne"}));
+        ArrayList<String> stavy = new ArrayList<>(List.of(new String[]{"Pozicane", "Volne"}));
 //        for (String stav : stavy) {
 //            if (!tmpStavy.containsKey(stav)) {
 //                tmpStavy.put(stav, stav);
@@ -208,9 +279,9 @@ public class App
 //            stavy_aut.add(new Pair(String.valueOf(i), entry.getKey()));
 //            i++;
 //        }
-        int i = 0;
+        int i = 1;
         for (String s : stavy) {
-            stav_auta.add(new Pair<Integer, String>(i, s));
+            stav_auta.add(new Pair<>(i, s));
             i++;
         }
         System.out.println("Stav auta vygenerovane: " + stav_auta.size());
@@ -218,7 +289,7 @@ public class App
 
     private static void typyGenerator() {
 //        TreeMap<String, String> tmpTypy = new TreeMap<>();
-        ArrayList<String> typy = new ArrayList<String>(List.of(new String[]{"Combi", "Suv", "Sedan"}));
+        ArrayList<String> typy = new ArrayList<>(List.of(new String[]{"Combi", "Suv", "Sedan"}));
 //        for (String typ: typy) {
 //            if (!tmpTypy.containsKey(typ)) {
 //                tmpTypy.put(typ, typ);
@@ -228,9 +299,9 @@ public class App
 //            typy_aut.add(new Pair(String.valueOf(i), entry.getKey()));
 //        i++;
 //        }
-        int i =0;
+        int i = 1;
         for (String s : typy) {
-            typy_aut.add(new Pair<Integer, String>(i, s));
+            typy_aut.add(new Pair<>(i, s));
             i++;
         }
         System.out.println("Typy aut vygenerovane: " + typy_aut.size());
@@ -245,7 +316,7 @@ public class App
             while (line != null) {
                 String[] obec = line.split(" ");
                 if (obec.length == 2) {
-                    adresa.add(new Pair(obec[1], obec[0]));
+                    adresa.add(new Pair<>(obec[1], obec[0]));
                 }
                 else {
                     StringBuilder builder = new StringBuilder();
@@ -253,7 +324,7 @@ public class App
                         builder.append(obec[j]).append(" ");
                     }
                     // ten substring tam je pre to aby som orezal poslednu medzeru
-                    adresa.add(new Pair(obec[obec.length - 1], builder.substring(0, builder.length() - 1)));
+                    adresa.add(new Pair<>(obec[obec.length - 1], builder.substring(0, builder.length() - 1)));
 
                 }
                 line = reader.readLine();
@@ -275,9 +346,7 @@ public class App
                 ulice.put(tmp, tmp);
             }
         }
-        for (String s : ulice.keySet()) {
-            arrUlice.add(s);
-        }
+        arrUlice.addAll(ulice.keySet());
 
         System.out.println("Pomocný zoznam ulíc vygenerovaný: " + arrUlice.size());
     }
@@ -362,11 +431,9 @@ public class App
                 numberOfCarsRentedToday--;
                 availableCars--;
             }
-
-            System.out.println("Date " + currentDate.toString() + "done, total transactions " +
-                    transakcie.size() + ", pocet volnych aut " + availableCars);
             currentDate = currentDate.plusDays(1);
         }
+        System.out.println("Transakcie vygenerovane, pocet transakcii: " + transakcie.size());
     }
 
     private static void rodneCislaGenerator() {
@@ -410,9 +477,7 @@ public class App
             }
         }
 
-        for (String s : obc.keySet()) {
-            arrObcianskyPreukaz.add(s);
-        }
+        arrObcianskyPreukaz.addAll(obc.keySet());
         System.out.println("Cisla obcianských preukazov vygenerovane: " + arrObcianskyPreukaz.size());
     }
 
@@ -461,14 +526,14 @@ public class App
             System.out.println("Priezviska zien nacitane: " + arrPriezviskoWoman.size());
 
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
 
     private static void osobaGenerator() {
         int pocetMuzov = 0;
         int pocetZien = 0;
-        for (int i = 0; i < POCET_OSOB; i++) {
+        for (int i = 1; i <= POCET_OSOB; i++) {
             Osoba tmpOsoba = new Osoba();
             if (random.nextDouble() > PRAVDEBODOBNST_ZENY){
                 // generujeme muzov
@@ -512,21 +577,18 @@ public class App
             Vozidlo.znacka_auta = carBrandPair.key;
             tmpVozidlo.typ_auta = typy_aut.get(random.nextInt(typy_aut.size())).key;
             tmpVozidlo.stav_vozidla = stav_auta.get(random.nextInt(stav_auta.size())).key;
-            tmpVozidlo.ecv = ""; //todo for matus generator xD
+            tmpVozidlo.ecv = faker.regexify("[A-Z]{2}[0-9]{3}[A-Z]{2}");
             tmpVozidlo.pocet_miest_na_sedenie = carBrandSeatsOptions.get(faker.random().nextInt(carBrandSeatsOptions.size()));
             tmpVozidlo.fotka = ""; //todo toto sa bude robit az pri vkladani dat do apexu, pridal som fotky do resources
             tmpVozidlo.rok_vyroby = 1989 + random.nextInt(32);
             char[] typ_motora = new char[]{'D', 'B', 'E'}; //dizel, benzín, elektrina
             tmpVozidlo.typ_motora = typ_motora[random.nextInt(typ_motora.length)];
-            tmpVozidlo.seriove_cislo_vozidla = String.valueOf(i); //todo asi nejaký lepší generátor
+            tmpVozidlo.seriove_cislo_vozidla = faker.regexify("[A-HJ-NPR-Z]") + faker.regexify("[0-9A-HJ-NPR-Z]{16}");
             tmpVozidlo.dayRentalPrice = carRentalDayPrices.get(faker.random().nextInt(0, carRentalDayPrices.size() - 1));
             vozidla.add(tmpVozidlo);
         }
         System.out.println("Vygenerované vozidla: " + vozidla.size());
     }
-
-    //todo transakcie viac máš maroš v hlasovke
-    //todo uložiť do súboru, da sa pre triedy ktoré sa poutívajú spraviť custom toString ktorý by ti automaticky vygeneroval riadok
 
     private static String generateBirthNumber(boolean womanGeneration) {
 

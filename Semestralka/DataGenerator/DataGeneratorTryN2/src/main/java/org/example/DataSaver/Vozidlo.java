@@ -1,5 +1,7 @@
 package org.example.DataSaver;
 
+import static org.example.DataSaver.DataSaver.CSV_DELIMETER;
+
 public class Vozidlo {
     public static int znacka_auta;
     public int typ_auta;
@@ -14,19 +16,11 @@ public class Vozidlo {
 
     public int dayRentalPrice;
 
+
     @Override
     public String toString() {
-        return "Vozidlo{" +
-                "typ_auta=" + typ_auta +
-                ", stav_vozidla=" + stav_vozidla +
-                ", ecv='" + ecv + '\'' +
-                ", pocet_miest_na_sedenie=" + pocet_miest_na_sedenie +
-                ", fotka='" + fotka + '\'' +
-                ", rok_vyroby=" + rok_vyroby +
-                ", pocet_najazdenych_km=" + pocet_najazdenych_km +
-                ", typ_motora=" + typ_motora +
-                ", seriove_cislo_vozidla='" + seriove_cislo_vozidla + '\'' +
-                ", dayRentalPrice=" + dayRentalPrice +
-                '}';
+        return String.valueOf(znacka_auta) + CSV_DELIMETER + typ_auta + CSV_DELIMETER + stav_vozidla + CSV_DELIMETER + ecv + CSV_DELIMETER
+                + pocet_miest_na_sedenie + CSV_DELIMETER + fotka + CSV_DELIMETER + rok_vyroby + CSV_DELIMETER
+                + pocet_najazdenych_km + CSV_DELIMETER + typ_motora + CSV_DELIMETER + seriove_cislo_vozidla + '\n';
     }
 }
