@@ -514,7 +514,7 @@ public class App
             tmpVozidlo.stav_vozidla = stav_auta.get(random.nextInt(stav_auta.size())).key;
             tmpVozidlo.ecv = ""; //todo for matus generator xD
             tmpVozidlo.pocet_miest_na_sedenie = carBrandSeatsOptions.get(faker.random().nextInt(carBrandSeatsOptions.size()));
-            tmpVozidlo.fotka = ""; //todo for maros toto nemam ponatia ako
+            tmpVozidlo.fotka = ""; //todo toto sa bude robit az pri vkladani dat do apexu, pridal som fotky do resources
             tmpVozidlo.rok_vyroby = 1989 + random.nextInt(32);
             char[] typ_motora = new char[]{'D', 'B', 'E'}; //dizel, benzín, elektrina
             tmpVozidlo.typ_motora = typ_motora[random.nextInt(typ_motora.length)];
