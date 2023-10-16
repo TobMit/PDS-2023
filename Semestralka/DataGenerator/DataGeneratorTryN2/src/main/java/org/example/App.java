@@ -571,10 +571,10 @@ public class App
         for (int i = 0; i < POCET_VOZIDIEL; i++) {
             Vozidlo tmpVozidlo = new Vozidlo();
 
-            Pair<Integer, String> carBrandPair = znacky_aut.get(random.nextInt(znacky_aut.size()));
+            Pair<Integer, String> carBrandPair = znacky_aut.get(faker.random().nextInt(znacky_aut.size()));
             List<Integer> carBrandSeatsOptions = numberOfCarSeats.get(carBrandPair.value);
 
-            Vozidlo.znacka_auta = carBrandPair.key;
+            tmpVozidlo.znacka_auta = carBrandPair.key;
             tmpVozidlo.typ_auta = typy_aut.get(random.nextInt(typy_aut.size())).key;
             tmpVozidlo.stav_vozidla = stav_auta.get(random.nextInt(stav_auta.size())).key;
             tmpVozidlo.ecv = faker.regexify("[A-Z]{2}[0-9]{3}[A-Z]{2}");
