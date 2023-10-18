@@ -45,3 +45,59 @@ select xmlroot(xmlelement("udaj",
     xmlelement("koniec", ukoncenie)), version '1.0')
     from STUDENT;
 
+-- ak daná osoba bola viac krát študentom tak sa zlúči do jedného pomocou agregačnej funkcie
+-- tento xml element je už správne formátovaný, má len jeden root element, ale údaje ešte nie sú spravné
+select xmlroot(
+        xmlelement("student", XMLAGG(
+            xmlelement("udaj",
+               xmlelement("rocnik", rocnik),
+               xmlelement("zaciatok", dat_zapisu),
+               xmlelement("koniec", ukoncenie)
+            ))
+        )
+    , version '1.0')
+    from STUDENT group by rod_cislo;
+
+-- pridám atribút udajú ktorý bude reprezentovať osobné číslo
+select xmlroot(
+        xmlelement("student", XMLAGG(
+            xmlelement("udaj",xmlattributes (os_cislo as "osobne_cislo"),
+               xmlelement("rocnik", rocnik),
+               xmlelement("zaciatok", dat_zapisu),
+               xmlelement("koniec", ukoncenie)
+            ))
+        )
+    , version '1.0')
+    from STUDENT group by rod_cislo;
+-- POZOR NA TESTE na tento xml dokument neviem povedať či je správny lebo nemá schému
+-- vložím tento select do tabulky a je tam a vyberieme rodné číslo a xml dokument
+insert into tablex
+    (select rod_cislo, xmlroot(
+        xmlelement("student", XMLAGG(
+            xmlelement("udaj",xmlattributes (os_cislo as "osobne_cislo"),
+               xmlelement("rocnik", rocnik),
+               xmlelement("zaciatok", dat_zapisu),
+               xmlelement("koniec", ukoncenie)
+            ))
+        )
+    , version '1.0')
+    from STUDENT group by rod_cislo);
+commit;
+
+select *
+from tablex;
+
+-- vypýsať všetky ročníky z tabuľky tablex
+select extractvalue(xml, '/student/udaj/rocnik[1]') as rocnik -- toto zobrazí iba prvý záznam inak je to zle
+    from tablex;
+
+select extract(xml, '/student/udaj/rocnik[1]') as rocnik -- toto zobrazí iba prvý záznam inak je to zle
+    from tablex;
+
+-- vypýsať jednotlivé ročníky a potlačiť dupicity na doma
+select distinct extractvalue(xml, '/student/udaj/rocnik[1]') as rocnik
+    from tablex; -- nie úplne správne
+
+-- konvertovať tabuľku tablex na tabulku xml dokumentov ZA 2 BODY asi done
+select xmlserialize(document xml) as xml
+    from tablex;

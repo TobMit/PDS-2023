@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4d736671-f85b-4d1d-b085-0dd3686796fd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/csv-editor.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Cvičenie T4/Cvičenie T4.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Cvičenie T4/Cvičenie T4.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/DataSaver/Vozidlo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/DataSaver/Vozidlo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DropAll.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../DropAll.sql" afterDir="false" />
     </list>
     <list id="a8945c77-6e84-4bcb-8e18-d5db51651c2a" name="Changes by axel" comment="" />
     <list id="1723d261-fceb-467e-8f1a-fc1a8fffa5e8" name="Changes by klacek" comment="" />
@@ -131,6 +128,7 @@
       <workItem from="1697488521681" duration="344000" />
       <workItem from="1697531621528" duration="114000" />
       <workItem from="1697531745061" duration="1601000" />
+      <workItem from="1697626735070" duration="691000" />
     </task>
     <servers />
   </component>
