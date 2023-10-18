@@ -12,3 +12,8 @@ drop type stavAuta;
 drop type transakcieObject;
 drop type vozidlaObjects;
 drop type znackyAut;
+drop table ADP$ERR$OSOBA;
+drop table ADP$ERR$TEST;
+drop table ADP$ERR$TRANSAKCIE;
+drop table ADP$ERR$VOZIDLA;
+drop table ADP$ERR$ZNACKY_AUT;

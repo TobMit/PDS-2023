@@ -3,7 +3,7 @@ package org.example.DataSaver;
 import static org.example.DataSaver.DataSaver.CSV_DELIMETER;
 
 public class Vozidlo {
-    public static int znacka_auta;
+    public int znacka_auta;
     public int typ_auta;
     public int stav_vozidla;
     public String ecv;

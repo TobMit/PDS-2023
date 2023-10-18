@@ -102,7 +102,7 @@ public class App
         }
 
         // adresa
-        adresaSaver.appendData("mesto" + CSV_DELIMETER + "psc" + '\n');
+        adresaSaver.appendData("psc" + CSV_DELIMETER + "mesto" + '\n');
         for (Pair<String , String > adresaPair: adresa) {
             adresaSaver.appendData(adresaPair.key + CSV_DELIMETER + adresaPair.value + '\n');
         }
@@ -574,7 +574,7 @@ public class App
             Pair<Integer, String> carBrandPair = znacky_aut.get(random.nextInt(znacky_aut.size()));
             List<Integer> carBrandSeatsOptions = numberOfCarSeats.get(carBrandPair.value);
 
-            Vozidlo.znacka_auta = carBrandPair.key;
+            tmpVozidlo.znacka_auta = carBrandPair.key;
             tmpVozidlo.typ_auta = typy_aut.get(random.nextInt(typy_aut.size())).key;
             tmpVozidlo.stav_vozidla = stav_auta.get(random.nextInt(stav_auta.size())).key;
             tmpVozidlo.ecv = faker.regexify("[A-Z]{2}[0-9]{3}[A-Z]{2}");
@@ -585,6 +585,7 @@ public class App
             tmpVozidlo.typ_motora = typ_motora[random.nextInt(typ_motora.length)];
             tmpVozidlo.seriove_cislo_vozidla = faker.regexify("[A-HJ-NPR-Z]") + faker.regexify("[0-9A-HJ-NPR-Z]{16}");
             tmpVozidlo.dayRentalPrice = carRentalDayPrices.get(faker.random().nextInt(0, carRentalDayPrices.size() - 1));
+            tmpVozidlo.pocet_najazdenych_km = faker.random().nextInt(10000, 200000);
             vozidla.add(tmpVozidlo);
         }
         System.out.println("Vygenerované vozidla: " + vozidla.size());

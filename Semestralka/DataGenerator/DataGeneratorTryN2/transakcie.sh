@@ -1,0 +1,1 @@
+sqlldr CONTROL=transakcie.ctl LOG=/Users/tobiasmitala/Desktop/log file/transakcie.log BAD=/Users/tobiasmitala/Desktop/bad file/transakcie.bad skip=1   
