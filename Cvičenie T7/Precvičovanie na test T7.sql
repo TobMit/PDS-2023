@@ -149,3 +149,303 @@ begin
 end;
 
 --13. Vypíšte ku každému odboru zoznam jednotlivých zameraní. Použite agregačnú funkciu listagg
+select ST_ODBOR, ST_ZAMERANIE, POPIS_ODBORU, listagg( ST_ZAMERANIE, ',') within group (  order by ST_ZAMERANIE)
+    from ST_ODBORY
+        group by ST_ODBOR, ST_ZAMERANIE, POPIS_ODBORU;
+
+--14. Ku každému predmetu vypíšte počet kreditov, ktoré sme prideľovali v jednotlivých akademických rokoch (tab. predmet_bod). Použite listagg.
+
+select distinct CIS_PREDM, NAZOV, SKROK
+    from PREDMET left join ZAP_PREDMETY using(cis_predm)
+        order by NAZOV;
+
+select CIS_PREDM, NAZOV, listagg( SKROK || ' - ' || ECTS, ',') within group ( order by SKROK)
+    from (select distinct CIS_PREDM, NAZOV, SKROK, ECTS
+            from PREDMET left join ZAP_PREDMETY using(cis_predm)
+                order by NAZOV)
+        group by CIS_PREDM, NAZOV;
+
+-- 15. Pre jednotlivé predmety vypíšte zoznam katedier, ktoré daný predmet garantovali. Použite listagg.
+select distinct CIS_PREDM, NAZOV, KATEDRA
+    from PREDMET join PREDMET_BOD pd using (cis_predm) left join UCITEL uc on pd.GARANT = uc.OS_CISLO
+        order by NAZOV;
+
+select CIS_PREDM, NAZOV, listagg(KATEDRA, ',') within group ( order by KATEDRA)
+    from (select CIS_PREDM, NAZOV, KATEDRA
+            from PREDMET join PREDMET_BOD pd using (cis_predm)
+                left join UCITEL uc on pd.GARANT = uc.OS_CISLO
+                    order by NAZOV)
+            group by CIS_PREDM, NAZOV
+                order by NAZOV;
+
+-- alebo pre neopakujúcesa zázami
+select CIS_PREDM, NAZOV, listagg(KATEDRA, ',') within group ( order by KATEDRA)
+    from (select distinct CIS_PREDM, NAZOV, KATEDRA
+            from PREDMET join PREDMET_BOD pd using (cis_predm)
+                left join UCITEL uc on pd.GARANT = uc.OS_CISLO
+                    order by NAZOV)
+            group by CIS_PREDM, NAZOV
+                order by NAZOV;
+
+-- 16. Vytvorte procedúru, ktorá v kurzore spracuje a vypíše osoby narodené v danom mesiaci (mesiac bude parametrom funkcie).
+create or replace procedure osoby_proc (
+    mesiac number
+)
+is
+    cursor cur is (select meno, PRIEZVISKO from OS_UDAJE where mod(substr(ROD_CISLO, 3,2), 50) = mesiac);
+    osoba cur%rowtype;
+begin
+    open cur;
+        loop
+            fetch cur into osoba;
+            exit when cur%notfound;
+            DBMS_OUTPUT.PUT_LINE(osoba.MENO || ' ' || osoba.PRIEZVISKO );
+        end loop;
+    close cur;
+end;
+/
+
+begin
+    osoby_proc(12);
+end;
+/
+
+-- 17. Vytvorte funkciu, ktorá vráti rodné číslo najstaršej osoby. Ak je ich viac s rovnakým vekom, potom ich vráťte ako reťazec viacerých rodných čísel oddelených medzerou.
+
+select 1900 + to_number(substr(ROD_CISLO, 1,2)) as vek
+    from OS_UDAJE
+        order by vek;
+
+select ROD_CISLO
+    from OS_UDAJE
+        where to_number(substr(ROD_CISLO, 1,2)) + 1900 = (select min(1900 + to_number(substr(ROD_CISLO, 1,2)))
+                            from OS_UDAJE);
+
+select listagg(ROD_CISLO, ',') within group ( order by 1900 + to_number(substr(ROD_CISLO, 1,2)) asc)
+    from OS_UDAJE
+        where to_number(substr(ROD_CISLO, 1,2)) + 1900 = (select min(1900 + to_number(substr(ROD_CISLO, 1,2)))
+                            from OS_UDAJE);
+
+select *
+from OS_UDAJE;
+
+create or replace function oldest_rod_cislo return varchar2 is
+    v_rod_cisla varchar2(1000);
+begin
+    select listagg(ROD_CISLO, ',') within group ( order by 1900 + to_number(substr(ROD_CISLO, 1,2)) asc) into v_rod_cisla
+        from OS_UDAJE
+            where to_number(substr(ROD_CISLO, 1,2)) + 1900 = (select min(1900 + to_number(substr(ROD_CISLO, 1,2)))
+                                from OS_UDAJE);
+    return v_rod_cisla;
+end;
+/
+
+select meno, PRIEZVISKO
+    from OS_UDAJE
+        where ROD_CISLO = oldest_rod_cislo();
+
+-- 18. Vytvorte funkciu, ktorej vstupom bude číslo predmetu. Výsledkom bude názov predmetu. Ošetrite výnimku, ak by taký predmet neexistoval.
+create or replace function najst_predmet (cislo_predmetu varchar2) return varchar2 is
+    nazov_predmetu varchar2(200);
+begin
+    select NAZOV into nazov_predmetu
+        from PREDMET where CIS_PREDM like cislo_predmetu;
+    return nazov_predmetu;
+    exception
+        when no_data_found then
+            return 'Predmet neexistuje';
+end najst_predmet;
+/
+
+select najst_predmet('IS09') from DUAL;
+
+-- 19. Vytvorte funkciu, ktorej parametrom bude mesiac, návratovou hodnotou bude počet osôb narodených v danom mesiaci. Ak zadaný mesiac nie je korektný, vyvolajte výnimku a vráťte hdonotu -1.
+select count (*)
+    from OS_UDAJE
+        where mod(to_nchar(substr(ROD_CISLO, 3, 2)), 50) = 4;
+
+create or replace function pocet_osob_v_mesiaci(p_mesiac number) return number is
+    return_pocet number;
+begin
+    if p_mesiac between 1 and 12 then
+        select count (*) into return_pocet
+            from OS_UDAJE
+                where mod(to_nchar(substr(ROD_CISLO, 3, 2)), 50) = p_mesiac;
+    return return_pocet;
+    else
+        raise_application_error(-20001, 'Zadali ste neplatny mesiac.');
+        return -1;
+    end if;
+end;
+/
+
+select pocet_osob_v_mesiaci(4) from DUAL;
+
+-- 20. Ku každému predmetu vypíšte 3 najlepších študentov podľa známky.
+
+select NAZOV
+    from PREDMET;
+
+select nazov, CIS_PREDM, meno, PRIEZVISKO, VYSLEDOK, row_number() over (partition by CIS_PREDM order by VYSLEDOK) as poradie
+    from OS_UDAJE join STUDENT using (rod_cislo)
+        join ZAP_PREDMETY using (os_cislo) join PREDMET using (cis_predm)
+                order by CIS_PREDM, poradie;
+
+select nazov, CIS_PREDM, meno, PRIEZVISKO
+    from (select nazov, CIS_PREDM, meno, PRIEZVISKO, VYSLEDOK, row_number() over (partition by CIS_PREDM order by VYSLEDOK) as poradie
+    from OS_UDAJE join STUDENT using (rod_cislo)
+        join ZAP_PREDMETY using (os_cislo) join PREDMET using (cis_predm)
+                order by CIS_PREDM, poradie)
+            where poradie <= 3
+                order by NAZOV;
+
+-- 21. Ku každému ročníku vypíšte 10% najmladších študentov.
+
+create or replace function GetVek(p_rc char)
+    return number
+is
+    vstupny_ret char(10);
+    datum_narodenia date;
+BEGIN
+    vstupny_ret:=substr(p_rc, 5, 2) || '.'
+                || mod(substr(p_rc, 3, 2),50)
+                || '.19' || substr(p_rc, 1, 2);
+    datum_narodenia:= to_date(vstupny_ret,'DD.MM.YYYY');
+    return months_between(sysdate, datum_narodenia)/12;
+    EXCEPTION
+        when others then return -1;
+end;
+/
+
+select rocnik, meno, PRIEZVISKO, ROD_CISLO, GETVEK(ROD_CISLO) as vek, row_number() over (partition by rocnik order by GETVEK(ROD_CISLO)) as riadky
+    from OS_UDAJE join STUDENT using (rod_cislo)
+        order by rocnik, vek;
+
+
+select *
+    from (select ROCNIK, meno, PRIEZVISKO, riadky
+        from (select rocnik, meno, PRIEZVISKO, ROD_CISLO, GETVEK(ROD_CISLO) as vek, row_number() over (partition by rocnik order by GETVEK(ROD_CISLO)) as riadky
+            from OS_UDAJE join STUDENT using (rod_cislo)
+                order by rocnik, riadky)) st
+        where riadky <= (select 0.1*count(*)+1 from STUDENT stu where st.rocnik = stu.ROCNIK);
+
+
+-- 22. Ku každej študíjnej skupine vypíšte 2 študentov, ktorí sa zapísali v minulosti (vyhodnotenie podľa atribútu dat_zapisu).
+select st_skupina, listagg(rnk || '. ' || meno || ' ' || priezvisko, ', ') within group (order by rnk, meno, priezvisko) from (
+    select st_skupina, meno, priezvisko, row_number() over (partition by st_skupina order by dat_zapisu) rnk from os_udaje
+    join student using(rod_cislo)
+)
+where rnk <= 2
+group by  st_skupina;
+
+-- 23. Ku každému odboru vypíšte 10 najlepších študentov podľa váženého študijného priemeru.
+select st_odbor, listagg(os_cislo, ', ') within group (order by os_cislo) from (
+select st_odbor, os_cislo, vap, row_number() over (partition by st_odbor order by vap) rnk from (
+    select st_odbor, os_cislo, sum(ects * case vysledok
+                    when 'A' then 1
+                    when 'B' then 1.5
+                    when 'C' then 2
+                    when 'D' then 2.5
+                    when 'E' then 3
+                    else 4 end) / sum(ects) vap from student
+    join zap_predmety using(os_cislo)
+    group by os_cislo, st_odbor
+))
+where rnk <= 10
+group by st_odbor;
+
+-- 25. Vytvorte typ ako kolekciu čísel. Vytvorte tabuľku, ktorá bude obsahovať dva atribúty – rodné číslo a kolekciu osobných čísel danej osoby. Naplňte tabuľku.
+create or replace type col_of_number as table of number;
+
+create table os_student (
+        rod_cislo varchar2(30),
+        os_cislo col_of_number
+) nested table os_cislo store as os_cisla_col;
+/
+
+insert into  os_student (select rod_cislo, cast(COLLECT(os_cislo) as col_of_number) from STUDENT group by rod_cislo);
+
+select *
+    from os_student;
+
+-- 26. Z tabuľky vytvorenej v predchádzajúcej úlohy vymažte všetky osobné čísla, ak už študent ukončil štúdium.
+update os_student
+    set os_cislo = null
+        where rod_cislo not in (select rod_cislo from STUDENT where ukoncenie is null);
+
+select *
+    from os_student;
+
+-- 27. Vytvorte objektový typ, ktorý bude obsahovať číslo predmetu a názov. Doplňte metódu na triedenie podľa počtu zapísaných študentov na daný predmet.
+create or replace type predme_nazov as object
+(
+    cis_predm char(4),
+    nazov varchar2(100),
+
+    map member function triedenie return integer
+)
+/
+
+create or replace type body predme_nazov is
+    map member function triedenie return integer
+    is
+        pocet integer;
+    begin
+        select count(*) into pocet from ZAP_PREDMETY z where z.CIS_PREDM like SELF.CIS_PREDM;
+        return pocet;
+    end;
+end;
+/
+
+-- 28 Vytvorte tabuľku objektov, ktorá bude obsahovať predmety povinné v 2. ročníku bc. štúdia Informatiky (st_odbor je 100, st_zameranie je 0). Zotrieďte záznamy podľa objektu.
+
+create table table_of_predm of predme_nazov;
+
+delete
+    from table_of_predm;
+
+insert into table_of_predm (select distinct CIS_PREDM, NAZOV
+                                from PREDMET join ST_PROGRAM using (cis_predm)
+                                    where ST_ODBOR = 100 and ST_ZAMERANIE = 0 and TYP_POVIN = 'P'
+                                        and CIS_PREDM in (select CIS_PREDM from STUDENT where ROCNIK = 2));
+
+select *
+    from table_of_predm t order by value(t);
+
+-- 29. Vytvorte tabuľku, kde objekt bude ako atribút. Naplňte ju obsahom tabuľky, ktorú ste vytvorili v predchádzajúcom bode.
+
+create table dalsia_tabulka(
+    atrb predme_nazov
+);
+/
+
+insert into dalsia_tabulka (select value(t) from table_of_predm t);
+
+select *
+    from dalsia_tabulka;
+
+-- 30. Vytvorte tabuľku XML dokumentov, ktorá bude obsahovať – koreňový element predmet,
+-- ktorý bude obsahovať atribút – číslo predmetu a názov. Hodnotou daného elementu bude zoznam študentov,
+-- ktorí majú daný predmet zapísaný. K nim budeme evidovať tieto elementy: meno, priezvisko, rodné číslo (ktoré bude mať ako atribúit osobné číslo).
+
+select xmlroot( XMLELEMENT(
+        "predmet",
+        xmlattributes(CIS_PREDM as "cis_p", NAZOV as "nazov"),
+        XMLAGG(
+            xmlelement(
+                    "student",
+                    xmlforest(
+                            meno as "meno",
+                            priezvisko as "priezviesko"
+                        ),
+                    xmlelement(
+                            "rod_cislo",
+                            xmlattributes(os_cislo as "os_cislo"),
+                            rod_cislo
+                        )
+                )
+            )
+    ),version '1.0')  as document from predmet join zap_predmety using(cis_predm)
+        join student using(os_cislo)
+            join os_udaje using(rod_cislo)
+                group by cis_predm, nazov
