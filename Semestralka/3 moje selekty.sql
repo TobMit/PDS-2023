@@ -26,12 +26,14 @@ BEGIN
 end;
 /
 
-select psc, mesto, sum(case when getvek(rod_cislo) between 18 and 45 then 1 else 0 end) as od_18_do_45,
+select id_okresu, okres.nazov, sum(case when getvek(rod_cislo) between 18 and 45 then 1 else 0 end) as od_18_do_45,
         sum(case when getvek(rod_cislo) between 45 and 60 then 1 else 0 end) as od_45_do_60,
         sum(case when getvek(rod_cislo) > 60  then 1 else 0 end) as viac_ako_60
-    from ADRESA left join OSOBA using (psc)
-        group by psc, mesto
-        order by psc;
+    from mesto left join OSOBA using (psc) left join OKRES using (id_okresu)
+        where substr(rod_cislo, 3,1) = '0' or substr(rod_cislo, 3,1) = '1'
+            group by id_okresu, okres.nazov
+                order by id_okresu;
+
 
 -- 3. TOP 10 najviac pozicanych aut podla poctu pozicanych dni
 SELECT ID_VOZIDLA,  sum(DAT_DO - DAT_OD) as pocet_dni
