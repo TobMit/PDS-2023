@@ -1,12 +1,15 @@
 package org.example;
 
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import net.datafaker.Faker;
-import org.example.DataSaver.DataSaver;
-import org.example.DataSaver.Osoba;
-import org.example.DataSaver.Transakcia;
-import org.example.DataSaver.Vozidlo;
+import org.example.DataSaver.*;
+import org.example.DataSaver.Mesto;
 
 
+import javax.management.InvalidAttributeValueException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,141 +23,162 @@ import static org.example.DataSaver.DataSaver.CSV_DELIMETER;
 
 /**
  * Hello world!
- *
  */
-public class App 
-{
-
-    public static final int POCET_ZNACIEK = 100;
-    public static final int POCET_ULIC = 70;
-    public static final int POCET_VOZIDIEL = 50;
-    public static final int POCET_OSOB = 2000;
+public class App {
+    public static final int POCET_VOZIDIEL = 900;
+    public static final int POCET_OSOB = 10000;
     public static final double PRAVDEBODOBNST_ZENY = 0.48;
-
     public static final LocalDate START_DATE = LocalDate.of(2008, 6, 14);
-
     public static final LocalDate END_DATE = LocalDate.now();
-
-    private static final ArrayList<Pair<Integer, String>> znacky_aut = new ArrayList<>();
-    private static final ArrayList<Pair<Integer, String>> stav_auta = new ArrayList<>();
-    private static final ArrayList<Pair<Integer, String>> typy_aut = new ArrayList<>();
-    private static final ArrayList<Pair<String, String>> adresa = new ArrayList<>();
-    private static final ArrayList<String> arrUlice = new ArrayList<>();
-    private static final ArrayList<String> arrRodCisloMuzi = new ArrayList<>();
-    private static final ArrayList<String> arrRodCisloZeny = new ArrayList<>();
-    private static final ArrayList<String> arrObcianskyPreukaz = new ArrayList<>();
-    private static final ArrayList<String> arrNameWoman = new ArrayList<>();
-    private static final ArrayList<String> arrNameMan = new ArrayList<>();
-    private static final ArrayList<String> arrPriezviskoWoman = new ArrayList<>();
-    private static final ArrayList<String> arrPriezviskoMan = new ArrayList<>();
-    private static final ArrayList<Osoba> osoba = new ArrayList<>();
-    private static final ArrayList<Vozidlo> vozidla = new ArrayList<>();
-    private static final ArrayList<Transakcia> transakcie = new ArrayList<>();
-
+    public static final ArrayList<Pair<Integer, String>> typy_aut = new ArrayList<>();
+    public static final ArrayList<String> arrRodCisloMuzi = new ArrayList<>();
+    public static final ArrayList<String> arrRodCisloZeny = new ArrayList<>();
+    public static final ArrayList<String> arrObcianskyPreukaz = new ArrayList<>();
+    public static final ArrayList<String> arrNameWoman = new ArrayList<>();
+    public static final ArrayList<String> arrNameMan = new ArrayList<>();
+    public static final ArrayList<String> arrPriezviskoWoman = new ArrayList<>();
+    public static final ArrayList<String> arrPriezviskoMan = new ArrayList<>();
+    public static final ArrayList<Osoba> osoba = new ArrayList<>();
+    public static final ArrayList<Vozidlo> vozidla = new ArrayList<>();
+    public static final ArrayList<Transakcia> transakcie = new ArrayList<>();
+    public static final ArrayList<Servis> servisy = new ArrayList<>();
     private static final HashMap<String, List<Integer>> numberOfCarSeats = new HashMap<>();
-
-    private static final Faker faker = new Faker(new Locale("sk"));
+    public static final Faker faker = new Faker(new Locale("sk"));
     private static final Random random = new Random();
+    private static final HashMap<String, List<Mesto>> okresyObceMap = new HashMap<>();
+    private static final HashMap<String, String> okresyMap = new HashMap<>();
 
-    public static void main( String[] args ) {
-        carGenerator();
+    public static void main(String[] args) {
+        okresyAndObceGenerator();
         typyGenerator();
-        stavGenerator();
-        adresaGenerator();
-        ulicaGenerator();
-        rodneCislaGenerator();
         numberOfSeatsGenerator();
+        vozidlaGenerator();
+        rodneCislaGenerator();
         obcianskyPreukazGenerator();
         menaPriezviskaGenerator();
         osobaGenerator();
-        vozidlaGenerator();
         transakciaGenerator();
 
         saveData();
     }
-
     private static void saveData() {
         // Output files
         DataSaver typyAutSaver = new DataSaver("typy_aut.csv");
         DataSaver stavAutaSaver = new DataSaver("stav_aut.csv");
         DataSaver znackyAutSaver = new DataSaver("znacky_aut.csv");
-        DataSaver adresaSaver = new DataSaver("adresa.csv");
-        DataSaver osobaSaver = new DataSaver("osoba.csv");
-        DataSaver vozidloSaver = new DataSaver("vozidlo.csv");
+        DataSaver mestoSaver = new DataSaver("mesta.csv");
+        DataSaver okresSaver = new DataSaver("okresy.csv");
+        DataSaver osobaSaver = new DataSaver("osoby.csv");
+        DataSaver vozidloSaver = new DataSaver("vozidla.csv");
         DataSaver transakcieSaver = new DataSaver("transakcie.csv");
+        DataSaver servisSaver = new DataSaver("servisy.csv");
 
         // typy aut
-        typyAutSaver.appendData("nazov_typu" + CSV_DELIMETER + "id_typu" + '\n');
-        for (Pair<Integer, String > typAutaPair: typy_aut) {
+        typyAutSaver.appendData("typ_auta" + CSV_DELIMETER + "id_typu" + '\n');
+        for (Pair<Integer, String> typAutaPair : typy_aut) {
             typyAutSaver.appendData(typAutaPair.value + CSV_DELIMETER + typAutaPair.key + '\n');
         }
 
         // stav aut
-        stavAutaSaver.appendData("nazov_stavu" + CSV_DELIMETER + "id_stavu" + '\n');
-        for (Pair<Integer, String > stavAutaPar: stav_auta) {
-            stavAutaSaver.appendData(stavAutaPar.value + CSV_DELIMETER + stavAutaPar.key + '\n');
-        }
+        stavAutaSaver.appendData("typ_stavu" + CSV_DELIMETER + "id_stavu" + '\n');
+        stavAutaSaver.appendData("volné" + CSV_DELIMETER + (StavVozidla.VOLNE.getStavVozidla() + 1) + '\n');
+        stavAutaSaver.appendData("požičané" + CSV_DELIMETER + (StavVozidla.POZICANE.getStavVozidla() + 1) + '\n');
+        stavAutaSaver.appendData("servis" + CSV_DELIMETER + (StavVozidla.SERVIS.getStavVozidla() + 1) + '\n');
 
         // znacka aut
+        int i = 1;
+        List<String> znackyAut = new ArrayList<>(numberOfCarSeats.keySet());
         znackyAutSaver.appendData("nazov_znacky" + CSV_DELIMETER + "id_znacky" + '\n');
-        for (Pair<Integer, String > znackyAutaPair: znacky_aut) {
-            znackyAutSaver.appendData(znackyAutaPair.value + CSV_DELIMETER + znackyAutaPair.key + '\n');
+        for (String znackaAuta : znackyAut) {
+            znackyAutSaver.appendData(znackaAuta + CSV_DELIMETER + i + CSV_DELIMETER + '\n');
+            i++;
         }
 
-        // adresa
-        adresaSaver.appendData("mesto" + CSV_DELIMETER + "psc" + '\n');
-        for (Pair<String , String > adresaPair: adresa) {
-            adresaSaver.appendData(adresaPair.key + CSV_DELIMETER + adresaPair.value + '\n');
+        i = 1;
+
+        // mesto
+        mestoSaver.appendData("id_okresu" + CSV_DELIMETER + "nazov" + CSV_DELIMETER + "psc" + '\n');
+        for (List<Mesto> mesta : okresyObceMap.values()) {
+            for (Mesto mesto : mesta) {
+                mestoSaver.appendData(String.valueOf(i) + CSV_DELIMETER + mesto.toString());
+            }
+            i++;
+        }
+
+        // okres
+        i = 1;
+        okresSaver.appendData("nazov" + CSV_DELIMETER + "id_okresu" + '\n');
+        for (String nazov : okresyMap.values()) {
+            okresSaver.appendData(String.valueOf(i) + CSV_DELIMETER + nazov + '\n');
+            i++;
         }
 
         // osoba
         osobaSaver.appendData("psc" + CSV_DELIMETER + "rod_cislo" + CSV_DELIMETER + "meno" +
                 CSV_DELIMETER + "priezvisko" + CSV_DELIMETER + "cislo_obcianskeho" + CSV_DELIMETER + "ulica" + CSV_DELIMETER + "id_osoby" + '\n');
-        for (Osoba osoba: osoba) {
+        for (Osoba osoba : osoba) {
             osobaSaver.appendData(osoba.toString());
         }
 
         // vozidlo
-        vozidloSaver.appendData("znacka_auta" + CSV_DELIMETER + "typ_auta" + CSV_DELIMETER + "stav_vozidla" +
+        vozidloSaver.appendData("znacka_auta" + CSV_DELIMETER + "typ_auta" + CSV_DELIMETER + "stav_auta" +
                 CSV_DELIMETER + "ecv" + CSV_DELIMETER + "pocet_miest_na_sedenie" + CSV_DELIMETER + "fotka" + CSV_DELIMETER
                 + "rok_vyroby" + CSV_DELIMETER + "pocet_najazdenych_km" + CSV_DELIMETER + "typ_motora" + CSV_DELIMETER + "seriove_cislo_vozidla" + '\n');
-        for (Vozidlo vozidlo: vozidla) {
+        for (Vozidlo vozidlo : vozidla) {
             vozidloSaver.appendData(vozidlo.toString());
         }
 
         // transakcie
         transakcieSaver.appendData("dat_od" + CSV_DELIMETER + "dat_do" + CSV_DELIMETER + "suma" +
-                CSV_DELIMETER + "id_osoby" + CSV_DELIMETER + "id_vozidla" + '\n');
-        for (Transakcia transakcia: transakcie) {
+                CSV_DELIMETER + "id_osoby" + CSV_DELIMETER + "id_vozidla" + CSV_DELIMETER + "pocet_najazdenych_km" + '\n');
+        for (Transakcia transakcia : transakcie) {
             transakcieSaver.appendData(transakcia.toString());
+        }
+
+        // servisy
+        servisSaver.appendData("dat_do" + CSV_DELIMETER + "suma" + CSV_DELIMETER + "id_vozidla" + CSV_DELIMETER + "dat_od" + '\n');
+        for (Servis servis : servisy) {
+            servisSaver.appendData(servis.toString());
         }
 
         typyAutSaver.saveDataToFile();
         stavAutaSaver.saveDataToFile();
         znackyAutSaver.saveDataToFile();
-        adresaSaver.saveDataToFile();
+        mestoSaver.saveDataToFile();
+        okresSaver.saveDataToFile();
         osobaSaver.saveDataToFile();
         vozidloSaver.saveDataToFile();
         transakcieSaver.saveDataToFile();
+        servisSaver.saveDataToFile();
 
     }
 
-    private static void carGenerator() {
-        TreeMap<String, String> tmpZnacky = new TreeMap<>();
-        while (tmpZnacky.size() < POCET_ZNACIEK) {
-            String carBrand = faker.vehicle().manufacturer();
-            if (!tmpZnacky.containsKey(carBrand)) {
-                tmpZnacky.put(carBrand, carBrand);
+    private static void okresyAndObceGenerator() {
+        try (CSVReader reader = new CSVReaderBuilder(new FileReader("src/main/java/org/example/DataSaver/Resources/okresy.csv"))
+                .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
+                .build()) {
+            reader.skip(1);
+            List<String[]> rows = reader.readAll();
+            for (String[] row : rows) {
+                okresyObceMap.put(row[1], new ArrayList<>());
+                okresyMap.put(row[1], row[2]);
             }
+        } catch (IOException | CsvException e) {
+            e.printStackTrace();
         }
 
-        int i = 1;
-        for (Map.Entry<String, String> entry : tmpZnacky.entrySet()) {
-            znacky_aut.add(new Pair<>(i, entry.getKey()));
-            i++;
+        try (CSVReader reader = new CSVReaderBuilder(new FileReader("src/main/java/org/example/DataSaver/Resources/obce.csv"))
+                .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
+                .build()) {
+            reader.skip(1);
+            List<String[]> rows = reader.readAll();
+            for (String[] row : rows) {
+                List<Mesto> value = okresyObceMap.get(row[1].substring(0, 6));
+                value.add(new Mesto(row[2], row[5]));
+            }
+        } catch (IOException | CsvException e) {
+            e.printStackTrace();
         }
-
-        System.out.println("Znacky aut vygenerovane: " + znacky_aut.size());
     }
 
     private static void numberOfSeatsGenerator() {
@@ -267,38 +291,9 @@ public class App
         numberOfCarSeats.put("IVM", List.of(5, 7));
     }
 
-    private static void stavGenerator() {
-//        TreeMap<String,String> tmpStavy = new TreeMap<String,String>();
-        ArrayList<String> stavy = new ArrayList<>(List.of(new String[]{"Pozicane", "Volne"}));
-//        for (String stav : stavy) {
-//            if (!tmpStavy.containsKey(stav)) {
-//                tmpStavy.put(stav, stav);
-//            }
-//        }
-//        for (Map.Entry<String, String> entry : tmpStavy.entrySet()) {
-//            stavy_aut.add(new Pair(String.valueOf(i), entry.getKey()));
-//            i++;
-//        }
-        int i = 1;
-        for (String s : stavy) {
-            stav_auta.add(new Pair<>(i, s));
-            i++;
-        }
-        System.out.println("Stav auta vygenerovane: " + stav_auta.size());
-    }
-
     private static void typyGenerator() {
-//        TreeMap<String, String> tmpTypy = new TreeMap<>();
         ArrayList<String> typy = new ArrayList<>(List.of(new String[]{"Combi", "Suv", "Sedan"}));
-//        for (String typ: typy) {
-//            if (!tmpTypy.containsKey(typ)) {
-//                tmpTypy.put(typ, typ);
-//            }
-//        }
-//        for (Map.Entry<String, String> entry : tmpTypy.entrySet()) {
-//            typy_aut.add(new Pair(String.valueOf(i), entry.getKey()));
-//        i++;
-//        }
+
         int i = 1;
         for (String s : typy) {
             typy_aut.add(new Pair<>(i, s));
@@ -307,133 +302,166 @@ public class App
         System.out.println("Typy aut vygenerovane: " + typy_aut.size());
     }
 
-    private static void adresaGenerator() {
-        BufferedReader reader;
-        try {
-            reader = new BufferedReader(new FileReader(
-                    "src/main/java/org/example/DataSaver/Resources/cities.txt"));
-            String line = reader.readLine();
-            while (line != null) {
-                String[] obec = line.split(" ");
-                if (obec.length == 2) {
-                    adresa.add(new Pair<>(obec[1], obec[0]));
-                }
-                else {
-                    StringBuilder builder = new StringBuilder();
-                    for (int j = 0; j < obec.length - 1; j++) {
-                        builder.append(obec[j]).append(" ");
-                    }
-                    // ten substring tam je pre to aby som orezal poslednu medzeru
-                    adresa.add(new Pair<>(obec[obec.length - 1], builder.substring(0, builder.length() - 1)));
-
-                }
-                line = reader.readLine();
-            }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Adresy nacitane: " + adresa.size());
-    }
-
-    private static void ulicaGenerator() {
-        // generuj názvy ulíc pomoco fakera
-        TreeMap<String, String> ulice = new TreeMap<>();
-        while (ulice.size() < POCET_ULIC){
-            String tmp = faker.address().streetAddress(false);
-            if (!ulice.containsKey(tmp)) {
-                ulice.put(tmp, tmp);
-            }
-        }
-        arrUlice.addAll(ulice.keySet());
-
-        System.out.println("Pomocný zoznam ulíc vygenerovaný: " + arrUlice.size());
-    }
-
     private static void transakciaGenerator() {
-        int availableCars = POCET_VOZIDIEL;
         LocalDate currentDate = START_DATE;
-        ArrayList<Integer> currentlyRentedCarsIndexes = new ArrayList<>();
+        // build a map of available vehicles based on the manufacture date
+        HashMap<Integer, List<Vozidlo>> currentlyAvailableCars = new HashMap<>();
+        while (currentDate.getYear() <= 2023) {
+            ArrayList<Vozidlo> currentYearCars = new ArrayList<>();
+            for (Vozidlo vozidlo : vozidla) {
+                if (vozidlo.rokVyroby <= currentDate.getYear()) {
+                    currentYearCars.add(vozidlo);
+                }
+            }
+            currentlyAvailableCars.put(currentDate.getYear(), currentYearCars);
+            currentDate = currentDate.plusYears(1);
+        }
+
+        currentDate = START_DATE;
+        int availableCars = currentlyAvailableCars.get(currentDate.getYear()).size();
+        int[] carServiceInterval = new int[]{2, 7};
+        ArrayList<Vozidlo> currentlyRentedCars = new ArrayList<>();
+        ArrayList<Vozidlo> currentlyMaintainedCarsIndexes = new ArrayList<>();
         ArrayList<Month> summerMonths = new ArrayList<>(List.of(Month.JUNE, Month.JULY, Month.AUGUST));
-        HashMap<LocalDate, List<Integer>> endDatesOfTransactions = new HashMap<>();
-        int numberOfCarsRentedToday;
+        HashMap<LocalDate, List<Vozidlo>> endDatesOfTransactions = new HashMap<>();
+        HashMap<LocalDate, List<Vozidlo>> endDateOfMaintenances = new HashMap<>();
+        int numberOfCarsToRentToday;
         int[] carRentDurationInterval;
-        int randomVehicleIndex;
+        Vozidlo randomVehicle;
         int randomPersonIndex;
+        TransakciaType transakciaType;
 
         while (!currentDate.isAfter(END_DATE)) {
+            // At the start of a new year add the new vehicles
+            if (currentDate.getDayOfYear() == 1 && currentDate.getYear() != START_DATE.getYear()) {
+                availableCars = currentlyAvailableCars.get(currentDate.getYear()).size() - currentlyMaintainedCarsIndexes.size() - currentlyRentedCars.size();
+            }
+
             // During the summer the people rent more cards for longer time periods
             if (summerMonths.contains(currentDate.getMonth()) || currentDate.getMonth() == Month.DECEMBER
                     || currentDate.getMonth() == Month.APRIL) {
-                numberOfCarsRentedToday = faker.random().nextInt(13, 18);
-                carRentDurationInterval = new int[]{1, 5};
+                numberOfCarsToRentToday = faker.random().nextInt(50, 80);
+                carRentDurationInterval = new int[]{7, 14};
+                transakciaType = TransakciaType.SUMMER;
             }
             // During the weekend people will rent more cars, but for a shorter duration
             else if (currentDate.getDayOfWeek() == DayOfWeek.SATURDAY || currentDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                numberOfCarsRentedToday = faker.random().nextInt(12, 15);
+                numberOfCarsToRentToday = faker.random().nextInt(25, 60);
                 carRentDurationInterval = new int[]{1, 5};
-            // During the weekdays people will rent fewer cards with an okay duration or the shortest duration
+                transakciaType = TransakciaType.WEEKEND;
+                // During the weekdays people will rent fewer cards with an okay duration or the shortest duration
             } else {
-                numberOfCarsRentedToday = faker.random().nextInt(23, 25);
+                numberOfCarsToRentToday = faker.random().nextInt(30, 40);
                 carRentDurationInterval = new int[]{1, 2};
+                transakciaType = TransakciaType.WEEKDAY;
             }
 
-            List<Integer> todayTransactions = endDatesOfTransactions.get(currentDate);
+            // add today's km count to the rented vehicles total km count
+            for (Vozidlo rentedVehicle : currentlyRentedCars) {
+                try {
+                    rentedVehicle.addDailyKm(transakciaType);
+                } catch (InvalidAttributeValueException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             // Remove car indexes whose rental ends today from the rented cars ArrayList
+            List<Vozidlo> todayTransactions = endDatesOfTransactions.get(currentDate);
             if (todayTransactions != null) {
-                for (int index: todayTransactions) {
-                    currentlyRentedCarsIndexes.remove(Integer.valueOf(index));
-                    availableCars++;
+                for (Vozidlo returnedVozidlo : todayTransactions) {
+                    currentlyRentedCars.remove(returnedVozidlo);
+                    // check if the car needs maintenance
+                    if (returnedVozidlo.requiresService()) {
+                        returnedVozidlo.stavVozidla = StavVozidla.SERVIS.getStavVozidla();
+                        int numberOfDaysInMaintenance = faker.random().nextInt(carServiceInterval[0], carServiceInterval[1]);
+                        LocalDate maintenanceEndDate = currentDate.plusDays(numberOfDaysInMaintenance);
+                        int price = faker.random().nextInt((int) (returnedVozidlo.dayRentalPrice * 0.2), returnedVozidlo.dayRentalPrice * 6);
+                        servisy.add(new Servis(returnedVozidlo.serioveCisloVozidla, currentDate, maintenanceEndDate, price));
+
+                        currentlyMaintainedCarsIndexes.add(returnedVozidlo);
+                        if (endDateOfMaintenances.containsKey(maintenanceEndDate)) {
+                            List<Vozidlo> currValue = endDateOfMaintenances.get(maintenanceEndDate);
+                            currValue.add(returnedVozidlo);
+                            endDateOfMaintenances.put(maintenanceEndDate, currValue);
+                        } else {
+                            endDateOfMaintenances.put(maintenanceEndDate, new ArrayList<>(List.of(returnedVozidlo)));
+                        }
+                    } else {
+                        availableCars++;
+                        returnedVozidlo.stavVozidla = StavVozidla.VOLNE.getStavVozidla();
+                    }
                 }
                 endDatesOfTransactions.remove(currentDate);
             }
 
-            // Generate transactions
-            while (numberOfCarsRentedToday > 0 && availableCars > 0) {
-                // select a random vehicle that is not being rented
-                randomVehicleIndex = faker.random().nextInt(0, POCET_VOZIDIEL - 1);
-                randomPersonIndex = faker.random().nextInt(0, POCET_OSOB - 1);
-                if (currentlyRentedCarsIndexes.isEmpty()) {
-                    currentlyRentedCarsIndexes.add(randomVehicleIndex);
-                } else {
-                    while (currentlyRentedCarsIndexes.contains(randomVehicleIndex)) {
-                        randomVehicleIndex = faker.random().nextInt(0, POCET_VOZIDIEL - 1);
-                    }
-                    currentlyRentedCarsIndexes.add(randomVehicleIndex);
+            // Remove car indexes whose maintenance ends today from the maintained cars HashMap
+            List<Vozidlo> todayMaintenanceEnds = endDateOfMaintenances.get(currentDate);
+            if (todayMaintenanceEnds != null) {
+                for (Vozidlo maintainedVozidlo : todayMaintenanceEnds) {
+                    currentlyMaintainedCarsIndexes.remove(maintainedVozidlo);
+                    maintainedVozidlo.stavVozidla = StavVozidla.VOLNE.getStavVozidla();
+                    availableCars++;
                 }
-                
-                Vozidlo selectedVehicle = vozidla.get(randomVehicleIndex);
+            }
+
+            // Generate transactions
+            while (numberOfCarsToRentToday > 0 && availableCars > 0) {
+                // select a random vehicle that is not being rented
+                List<Vozidlo> currentCarIndexes = currentlyAvailableCars.get(currentDate.getYear());
+                randomVehicle = currentCarIndexes.get(faker.random().nextInt(currentCarIndexes.size()));
+                randomPersonIndex = faker.random().nextInt(POCET_OSOB);
+                if (currentlyRentedCars.isEmpty()) {
+                    currentlyRentedCars.add(randomVehicle);
+                } else {
+                    while (randomVehicle.stavVozidla != StavVozidla.VOLNE.getStavVozidla()) {
+                        randomVehicle = currentCarIndexes.get(faker.random().nextInt(currentCarIndexes.size()));
+                    }
+                    currentlyRentedCars.add(randomVehicle);
+                }
+
+                randomVehicle.stavVozidla = StavVozidla.POZICANE.getStavVozidla();
                 Osoba selectedPerson = osoba.get(randomPersonIndex);
                 int daysRented = faker.random()
                         .nextInt(carRentDurationInterval[0], carRentDurationInterval[1]);
-                int totalRentalPrice = selectedVehicle.dayRentalPrice * daysRented;
+                int totalRentalPrice = randomVehicle.dayRentalPrice * daysRented;
                 LocalDate rentalEndDate = currentDate.plusDays(daysRented);
 
                 Transakcia transaction;
                 if (rentalEndDate.isBefore(END_DATE)) {
+                    LocalDate currTempDate = currentDate;
+                    while (!currTempDate.isAfter(rentalEndDate)) {
+                        try {
+                            randomVehicle.addDailyKm(transakciaType);
+                        } catch (InvalidAttributeValueException e) {
+                            throw new RuntimeException(e);
+                        }
+                        currTempDate = currTempDate.plusDays(1);
+                    }
                     transaction = new Transakcia(currentDate, rentalEndDate, totalRentalPrice,
-                            selectedPerson.id_osoby, selectedVehicle.seriove_cislo_vozidla);
+                            selectedPerson.id_osoby, randomVehicle.serioveCisloVozidla, randomVehicle.poslednePozicaniePocetkm);
+                    randomVehicle.pocetNajazdenychKm += randomVehicle.poslednePozicaniePocetkm;
+                    randomVehicle.poslednePozicaniePocetkm = 0;
                 } else {
                     transaction = new Transakcia(currentDate, totalRentalPrice,
-                            selectedPerson.id_osoby, selectedVehicle.seriove_cislo_vozidla);
+                            selectedPerson.id_osoby, randomVehicle.serioveCisloVozidla);
                 }
                 transakcie.add(transaction);
 
                 if (endDatesOfTransactions.containsKey(rentalEndDate)) {
-                    List<Integer> currValue = endDatesOfTransactions.get(rentalEndDate);
-                    currValue.add(randomVehicleIndex);
+                    List<Vozidlo> currValue = endDatesOfTransactions.get(rentalEndDate);
+                    currValue.add(randomVehicle);
                     endDatesOfTransactions.put(rentalEndDate, currValue);
                 } else {
-                    endDatesOfTransactions.put(rentalEndDate, new ArrayList<>(List.of(randomVehicleIndex)));
+                    endDatesOfTransactions.put(rentalEndDate, new ArrayList<>(List.of(randomVehicle)));
                 }
 
-                numberOfCarsRentedToday--;
+                numberOfCarsToRentToday--;
                 availableCars--;
             }
             currentDate = currentDate.plusDays(1);
         }
         System.out.println("Transakcie vygenerovane, pocet transakcii: " + transakcie.size());
+        System.out.println("Number of services: " + servisy.size());
     }
 
     private static void rodneCislaGenerator() {
@@ -441,7 +469,7 @@ public class App
         TreeMap<String, String> zeny = new TreeMap<>();
         while (muzi.size() < POCET_OSOB) {
             String tmp = generateBirthNumber(false);
-            if (!muzi.containsKey(tmp)){
+            if (!muzi.containsKey(tmp)) {
                 muzi.put(tmp, tmp);
             }
         }
@@ -450,7 +478,7 @@ public class App
 
         while (zeny.size() < POCET_OSOB) {
             String tmp = generateBirthNumber(true);
-            if (!zeny.containsKey(tmp)){
+            if (!zeny.containsKey(tmp)) {
                 zeny.put(tmp, tmp);
             }
         }
@@ -461,7 +489,7 @@ public class App
 
     private static void obcianskyPreukazGenerator() {
         TreeMap<String, String> obc = new TreeMap<>();
-        while (obc.size() < 2*POCET_OSOB){
+        while (obc.size() < 2 * POCET_OSOB) {
             StringBuilder builder = new StringBuilder();
             char tmp = 'A';
             builder.append((char) (tmp + random.nextInt(26)));
@@ -533,29 +561,27 @@ public class App
     private static void osobaGenerator() {
         int pocetMuzov = 0;
         int pocetZien = 0;
+        List<String> okresyKeys = List.copyOf(okresyMap.keySet());
         for (int i = 1; i <= POCET_OSOB; i++) {
             Osoba tmpOsoba = new Osoba();
-            if (random.nextDouble() > PRAVDEBODOBNST_ZENY){
+
+            tmpOsoba.cislo_obcianskeho = getCisloObcianskeho();
+            tmpOsoba.ulica = faker.address().streetAddress();
+            tmpOsoba.id_osoby = i;
+            List<Mesto> randomOkresList = okresyObceMap.get(okresyKeys.get(faker.random().nextInt(okresyKeys.size())));
+            tmpOsoba.psc = randomOkresList.get(faker.random().nextInt(randomOkresList.size())).psc;
+
+            if (random.nextDouble() > PRAVDEBODOBNST_ZENY) {
                 // generujeme muzov
-                Pair<String, String> tmpAdresa = adresa.get(random.nextInt(adresa.size()));
-                tmpOsoba.psc = tmpAdresa.key;
                 tmpOsoba.rod_cislo = getRodCislo(false);
                 tmpOsoba.Meno = arrNameMan.get(random.nextInt(arrNameMan.size()));
                 tmpOsoba.Priezvisko = arrPriezviskoMan.get(random.nextInt(arrPriezviskoMan.size()));
-                tmpOsoba.cislo_obcianskeho = getCisloObcianskeho();
-                tmpOsoba.ulica = tmpAdresa.value;
-                tmpOsoba.id_osoby = i;
                 pocetMuzov++;
             } else {
                 // generujeme zeny
-                Pair<String, String> tmpAdresa = adresa.get(random.nextInt(adresa.size()));
-                tmpOsoba.psc = tmpAdresa.key;
                 tmpOsoba.rod_cislo = getRodCislo(true);
                 tmpOsoba.Meno = arrNameWoman.get(random.nextInt(arrNameWoman.size()));
                 tmpOsoba.Priezvisko = arrPriezviskoWoman.get(random.nextInt(arrPriezviskoWoman.size()));
-                tmpOsoba.cislo_obcianskeho = getCisloObcianskeho();
-                tmpOsoba.ulica = tmpAdresa.value;
-                tmpOsoba.id_osoby = i;
                 pocetZien++;
             }
 //            System.out.println(tmpOsoba);
@@ -568,23 +594,26 @@ public class App
 
     private static void vozidlaGenerator() {
         ArrayList<Integer> carRentalDayPrices = new ArrayList<>(List.of(50, 80, 100, 150, 170, 200, 400, 500));
+        List<String> carBrands = List.copyOf(numberOfCarSeats.keySet());
         for (int i = 0; i < POCET_VOZIDIEL; i++) {
             Vozidlo tmpVozidlo = new Vozidlo();
 
-            Pair<Integer, String> carBrandPair = znacky_aut.get(faker.random().nextInt(znacky_aut.size()));
-            List<Integer> carBrandSeatsOptions = numberOfCarSeats.get(carBrandPair.value);
+            int randomIndex = faker.random().nextInt(carBrands.size());
+            List<Integer> carBrandSeatsOptions = numberOfCarSeats.get(carBrands.get(randomIndex));
 
-            tmpVozidlo.znacka_auta = carBrandPair.key;
-            tmpVozidlo.typ_auta = typy_aut.get(random.nextInt(typy_aut.size())).key;
-            tmpVozidlo.stav_vozidla = stav_auta.get(random.nextInt(stav_auta.size())).key;
+            tmpVozidlo.id = i + 1;
+            tmpVozidlo.znackaAuta = randomIndex + 1;
+            tmpVozidlo.typAuta = typy_aut.get(random.nextInt(typy_aut.size())).key;
+            tmpVozidlo.stavVozidla = StavVozidla.VOLNE.getStavVozidla();
             tmpVozidlo.ecv = faker.regexify("[A-Z]{2}[0-9]{3}[A-Z]{2}");
-            tmpVozidlo.pocet_miest_na_sedenie = carBrandSeatsOptions.get(faker.random().nextInt(carBrandSeatsOptions.size()));
-            tmpVozidlo.fotka = ""; //todo toto sa bude robit az pri vkladani dat do apexu, pridal som fotky do resources
-            tmpVozidlo.rok_vyroby = 1989 + random.nextInt(32);
+            tmpVozidlo.pocetMiestNaSedenie = carBrandSeatsOptions.get(faker.random().nextInt(carBrandSeatsOptions.size()));
+            tmpVozidlo.fotka = ""; //toto sa bude robit az pri vkladani dat do apexu, pridal som fotky do resources
+            tmpVozidlo.rokVyroby = 2002 + random.nextInt(21);
             char[] typ_motora = new char[]{'D', 'B', 'E'}; //dizel, benzín, elektrina
-            tmpVozidlo.typ_motora = typ_motora[random.nextInt(typ_motora.length)];
-            tmpVozidlo.seriove_cislo_vozidla = faker.regexify("[A-HJ-NPR-Z]") + faker.regexify("[0-9A-HJ-NPR-Z]{16}");
+            tmpVozidlo.typMotora = typ_motora[random.nextInt(typ_motora.length)];
+            tmpVozidlo.serioveCisloVozidla = faker.regexify("[A-HJ-NPR-Z]") + faker.regexify("[0-9A-HJ-NPR-Z]{16}");
             tmpVozidlo.dayRentalPrice = carRentalDayPrices.get(faker.random().nextInt(0, carRentalDayPrices.size() - 1));
+            tmpVozidlo.pocetNajazdenychKm = faker.random().nextInt(0, 368_945);
             vozidla.add(tmpVozidlo);
         }
         System.out.println("Vygenerované vozidla: " + vozidla.size());
