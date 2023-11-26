@@ -81,9 +81,9 @@ public class App {
 
         // stav aut
         stavAutaSaver.appendData("typ_stavu" + CSV_DELIMETER + "id_stavu" + '\n');
-        stavAutaSaver.appendData("volné" + CSV_DELIMETER + (StavVozidla.VOLNE.getStavVozidla() + 1) + '\n');
-        stavAutaSaver.appendData("požičané" + CSV_DELIMETER + (StavVozidla.POZICANE.getStavVozidla() + 1) + '\n');
-        stavAutaSaver.appendData("servis" + CSV_DELIMETER + (StavVozidla.SERVIS.getStavVozidla() + 1) + '\n');
+        stavAutaSaver.appendData("volné" + CSV_DELIMETER + (StavVozidla.VOLNE.getStavVozidla()) + '\n');
+        stavAutaSaver.appendData("požičané" + CSV_DELIMETER + (StavVozidla.POZICANE.getStavVozidla()) + '\n');
+        stavAutaSaver.appendData("servis" + CSV_DELIMETER + (StavVozidla.SERVIS.getStavVozidla()) + '\n');
 
         // znacka aut
         int i = 1;
