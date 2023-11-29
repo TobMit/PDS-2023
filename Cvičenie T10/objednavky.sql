@@ -5,32 +5,15 @@
 --  DDL for Table OBJEDNAVKY
 --------------------------------------------------------
 
-  CREATE TABLE OBJEDNAVKY  
-   (	ID_ZAK NUMBER(*,0), 
-	MENO_ZAK VARCHAR2(20 CHAR), 
-	ID_OBJ NUMBER(*,0), 
-	ID_PROD NUMBER(*,0), 
-	NAZOV_PROD VARCHAR2(20 CHAR), 
-	MNOZSTVO NUMBER
-   ) ;
---------------------------------------------------------
---  DDL for Table OBJEDNAVKY2
---------------------------------------------------------
 
-  CREATE TABLE OBJEDNAVKY2  
-   (	ID_ZAK NUMBER(*,0), 
-	MENO_ZAK VARCHAR2(20 CHAR), 
-	ID_OBJ NUMBER(*,0), 
-	ID_PROD NUMBER(*,0), 
-	NAZOV_PROD VARCHAR2(20 CHAR), 
-	MNOZSTVO NUMBER
-   ) ;
-REM INSERTING into OBJEDNAVKY
-SET DEFINE OFF;
+
+
+--REM INSERTING into OBJEDNAVKY
+--SET DEFINE OFF;
 Insert into OBJEDNAVKY (ID_ZAK,MENO_ZAK,ID_OBJ,ID_PROD,NAZOV_PROD,MNOZSTVO) values ('50042','Peter Sedlacek','421','4280','Tehly-paleta','110');
 Insert into OBJEDNAVKY (ID_ZAK,MENO_ZAK,ID_OBJ,ID_PROD,NAZOV_PROD,MNOZSTVO) values ('50042','Peter Sedlacek','421','6520','Dlazobne kocky','140');
-REM INSERTING into OBJEDNAVKY2
-SET DEFINE OFF;
+--REM INSERTING into OBJEDNAVKY2
+--SET DEFINE OFF;
 Insert into OBJEDNAVKY2 (ID_ZAK,MENO_ZAK,ID_OBJ,ID_PROD,NAZOV_PROD,MNOZSTVO) values ('51069','Emil Krsak','422','4280','Tehly-paleta','80');
 Insert into OBJEDNAVKY2 (ID_ZAK,MENO_ZAK,ID_OBJ,ID_PROD,NAZOV_PROD,MNOZSTVO) values ('51069','Emil Krsak','422','6520','Dlazobne kocky','80');
 Insert into OBJEDNAVKY2 (ID_ZAK,MENO_ZAK,ID_OBJ,ID_PROD,NAZOV_PROD,MNOZSTVO) values ('50741','Stefan Toth','423','4280','Tehly-paleta','60');
