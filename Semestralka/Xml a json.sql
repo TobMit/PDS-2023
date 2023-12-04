@@ -26,17 +26,20 @@ SELECT xmlroot(XMLELEMENT(
                                     ORDER BY rok, mesiac
                         )
                             GROUP BY rok
-                )
+                );
+
 -- json ktorý obsahuje vozdila a k ním servis v poslednom roku (keby to chceme pre všetky roky tak nam to oracle nedovolí (príliž dlhý reťazec))
+-- json pre každe auto je preto lebo by to oracle nezvládlo (veľa znakov)
 select json_object(
         'id_vozidla' value seriove_cislo_vozidla,
         'servis' value json_arrayagg(
             json_object(
-                'datum' value dat_od,
-                'suma' value suma
+                'datum' value nested_servis.dat_od,
+                'suma' value nested_servis.suma
             )
         )
     )
-    from vozidlo v left join servis s on v. seriove_cislo_vozidla = s.ID_VOZIDLA
+    from vozidlo v left join servis s on v. seriove_cislo_vozidla = s.ID_VOZIDLA,
+        TABLE(s.SERVIS_NESTED_TABLE) nested_servis
         where extract(year from dat_od) = extract(year from sysdate)
             group by seriove_cislo_vozidla;
