@@ -371,7 +371,7 @@ select *
 -- 26. Z tabuľky vytvorenej v predchádzajúcej úlohy vymažte všetky osobné čísla, ak už študent ukončil štúdium.
 update os_student
     set os_cislo = null
-        where rod_cislo not in (select rod_cislo from STUDENT where ukoncenie is null);
+        where rod_cislo not in (select rod_cislo from STUDENT where ukoncenie is not null);
 
 select *
     from os_student;
