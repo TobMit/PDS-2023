@@ -41,3 +41,30 @@ SELECT ID_VOZIDLA,  sum(DAT_DO - DAT_OD) as pocet_dni
         where dat_do is not null
             group by ID_VOZIDLA
                 order BY sum(DAT_DO - DAT_OD) desc fetch first 10 rows with TIES;
+
+
+-- DB link na asterixovi
+create database link semestrakla_link
+CONNECT TO mitala1 IDENTIFIED BY hesloXDDDDD -- tu treba dať vlastné helso a miesto mitala1 dať svoj login
+using '(DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = obelix.fri.uniza.sk)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = orcl.fri.uniza.sk)
+    )
+  )
+';
+/
+
+drop database link semestrakla_link;
+
+select *
+    from OS_UDAJE join STUDENT@semestrakla_link using(ROD_CISLO);
+
+-- 22. Ku každej študíjnej skupine vypíšte 2 študentov, ktorí sa zapísali v minulosti
+select st_skupina, listagg(rnk || '. ' || meno || ' ' || priezvisko, ', ') within group (order by rnk, meno, priezvisko) from (
+    select st_skupina, meno, priezvisko, row_number() over (partition by st_skupina order by dat_zapisu) rnk from os_udaje
+    join STUDENT@semestrakla_link using(rod_cislo)
+)
+where rnk <= 2
+group by  st_skupina;
