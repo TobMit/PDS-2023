@@ -111,7 +111,7 @@ is
     -- jednoducho povedané, vždy ju musím na konci ukončiť
 begin
     insert into moja_zaloha values (id);
-    rollback;
+    commit;
 end;
 /
 
@@ -128,6 +128,9 @@ end;
 
 commit;
 select * from moja_zaloha;
+delete from moja_zaloha;
+drop table moja_zaloha;
+drop procedure vloz;
 
 -- vytvorenie nejakého používateľa
 

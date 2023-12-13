@@ -47,7 +47,12 @@ commit;
 select *
 from table_of_xml;
 
-select
+create table json_table_dva (
+    data clob check (data is json)
+)
+/
+
+ insert into json_table_dva select
     JSON_OBJECT(
         'meno' value meno,
         'priezvisko' value PRIEZVISKO,
@@ -58,6 +63,10 @@ select
         )
         from OS_UDAJE join student using(rod_cislo)
             group by meno, PRIEZVISKO, rod_cislo;
+
+select b.data.meno, b.data.priezvisko, bb.odbor
+    from json_table_dva b,json_table( b.DATA.studium, '$' columns(odbor varchar2(50) path '$.odbor')) bb
+        where bb.odbor < 200;
 
 -- upravte to tak aby zdrojom bola tá xml tabuľka
 
