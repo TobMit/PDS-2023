@@ -133,3 +133,53 @@ CREATE TABLE P_PRISPEVKY_Fragment2 AS
         FROM P_PRISPEVKY;
 
 
+-- Vypíšte názvy typov príspevkov, ktoré NEBOLI vyplácané minulý kalendárny mesiac. Použite EXISTS.
+select id_typu, POPIS
+    from MITALA1.P_TYP_PRISPEVKU t
+        where not exists(
+            select 'x'
+                from P_PRISPEVKY p
+                    where t.ID_TYPU = p.ID_TYPU and
+                          extract(month from KEDY) = extract(month from add_months(sysdate, -1)) and
+                          extract(year from KEDY) = extract(year from sysdate)
+        );
+
+CREATE TYPE t_osoba IS OBJECT ( rc char(11), meno varchar2(20), priezvisko varchar2(20) ) NOT FINAL;
+CREATE TYPE T_zam1 UNDER t_osoba( oc number, pozicia varchar(10) );
+CREATE TABLE zamestnanci OF t_zam1;
+drop type T_zam1;
+drop type t_osoba;
+drop table zamestnanci;
+
+insert into zamestnanci values ( t_zam1('765402/8877', 'Meno','Priezv', 123, 'sef'));
+insert into zamestnanci values ( t_osoba('765402/8877', 'Meno','Priezv'), 123, 'sef')
+select *
+from zamestnanci;
+
+select *
+from USER_CONSTRAINTS;
+
+-- vypíšte 5% podľa dátumu zaplatenia odvodu za tento mesiac. Budú vypísané tie odoby ktoré zaplatili ako prvé
+select *
+    from (
+        select ROD_CISLO, DAT_PLATBY, row_number() over (order by DAT_PLATBY) poradie
+            from P_POISTENIE t join P_ODVOD_PLATBA p on (t.ID_POISTENCA = p.ID_POISTENCA)
+                where extract(month from DAT_PLATBY) = extract(month from sysdate)
+         )
+        where poradie <= 0.05* (select count(*) from P_ODVOD_PLATBA where extract(month from DAT_PLATBY) = extract(month from sysdate)) + 1
+
+select 'drop table ' || table_name || ';' from tabs where user like 'MITALA1%';
+
+
+declare type t_pole IS VARRAY(10) OF integer;
+    i integer;
+    pole t_pole;
+    j integer;
+begin
+    pole := t_pole(1,2,3,4,5,6,7,8);
+    j := pole.first;
+    for i in 1 .. pole.count loop
+        dbms_output.put_line(pole(j));
+        j := pole.next(j);
+        end loop;
+end; /
